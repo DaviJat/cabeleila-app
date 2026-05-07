@@ -42,7 +42,6 @@ class Client extends Authenticatable
         return [
             'birth_date' => 'date',
             'otp_expires_at' => 'datetime',
-            'email_verified_at' => 'datetime',
         ];
     }
 
