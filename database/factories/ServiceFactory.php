@@ -19,7 +19,7 @@ class ServiceFactory extends Factory
     {
         return [
             'name' => $this->faker->word(),
-            'description' => 'Serviço de alta qualidade realizado por nossos especialistas.',
+            'description' => $this->faker->sentence(),
             'price' => $this->faker->randomFloat(2, 50, 200),
             'duration_minutes' => 60,
         ];

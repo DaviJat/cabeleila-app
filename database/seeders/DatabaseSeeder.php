@@ -34,17 +34,58 @@ class DatabaseSeeder extends Seeder
         // Criação de usuários secundários para testes de permissão
         User::factory(2)->create();
 
-        // Definição do catálogo de serviços com escopo real de preços e durações
+        // Definição do catálogo de serviços com escopo real de descrições, preços e durações
         $services = Service::factory()
-            ->count(7)
+            ->count(8)
             ->state(new Sequence(
-                ['name' => 'Corte', 'price' => 80.00, 'duration_minutes' => 45],
-                ['name' => 'Coloração', 'price' => 250.00, 'duration_minutes' => 150],
-                ['name' => 'Tratamento Capilar', 'price' => 120.00, 'duration_minutes' => 60],
-                ['name' => 'Penteado', 'price' => 180.00, 'duration_minutes' => 90],
-                ['name' => 'Escova Modeladora', 'price' => 60.00, 'duration_minutes' => 40],
-                ['name' => 'Manicure', 'price' => 100.00, 'duration_minutes' => 30],
-                ['name' => 'Pedicure', 'price' => 110.00, 'duration_minutes' => 30],
+                [
+                    'name' => 'Corte Feminino',
+                    'description' => 'Corte estilizado incluindo lavagem e secagem básica.',
+                    'price' => 80.00,
+                    'duration_minutes' => 60
+                ],
+                [
+                    'name' => 'Corte Masculino',
+                    'description' => 'Corte moderno com acabamento detalhado.',
+                    'price' => 45.00,
+                    'duration_minutes' => 40
+                ],
+                [
+                    'name' => 'Manicure',
+                    'description' => 'Cutilagem e esmaltação das unhas das mãos.',
+                    'price' => 30.00,
+                    'duration_minutes' => 45
+                ],
+                [
+                    'name' => 'Pedicure',
+                    'description' => 'Cutilagem e esmaltação das unhas dos pés.',
+                    'price' => 35.00,
+                    'duration_minutes' => 50
+                ],
+                [
+                    'name' => 'Escova e Modelagem',
+                    'description' => 'Lavagem capilar e finalização com escova.',
+                    'price' => 55.00,
+                    'duration_minutes' => 45
+                ],
+                [
+                    'name' => 'Coloração Completa',
+                    'description' => 'Aplicação de tintura profissional em todo o cabelo.',
+                    'price' => 150.00,
+                    'duration_minutes' => 120
+                ],
+                [
+                    'name' => 'Hidratação Profunda',
+                    'description' => 'Tratamento de reposição de nutrientes e brilho.',
+                    'price' => 70.00,
+                    'duration_minutes' => 40
+                ],
+                [
+                    'name' => 'Design de Sobrancelha',
+                    'description' => 'Modelagem de sobrancelhas com pinça ou linha.',
+                    'price' => 35.00,
+                    'duration_minutes' => 30
+                ],
             ))
             ->create();
 
