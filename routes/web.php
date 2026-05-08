@@ -15,11 +15,11 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/appointments', [AppointmentController::class, 'index'])->name('admin.appointments');
-    Route::get('/clients', [ClientController::class, 'index'])->name('admin.clients');
-    Route::get('/availabilities', [AvailabilityController::class, 'index'])->name('admin.availabilities');
-    Route::get('/services', [ServiceController::class, 'index'])->name('admin.services');
+    Route::get('/painel', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/agendamentos', [AppointmentController::class, 'index'])->name('admin.appointments');
+    Route::get('/clientes', [ClientController::class, 'index'])->name('admin.clients');
+    Route::get('/horarios', [AvailabilityController::class, 'index'])->name('admin.availabilities');
+    Route::get('/servicos', [ServiceController::class, 'index'])->name('admin.services');
 
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
