@@ -9,6 +9,7 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import 'primeicons/primeicons.css'
 import PrimeVue from 'primevue/config';
 import CustomPreset from './preset';
+import ToastService from 'primevue/toastservice';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -41,7 +42,9 @@ createInertiaApp({
                     clear: 'Limpar',
                 }
             })
-            .mount(el);
+            .use(ToastService)
+            .mount(el)
+            ;
     },
     progress: {
         color: '#4B5563',

@@ -1,10 +1,15 @@
 <script setup>
+import { ref } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Panel from 'primevue/panel';
 import Button from 'primevue/button';
+
+import CreateServiceDialog from './Partials/CreateServiceDialog.vue';
+
+const displayDialog = ref(false);
 
 const props = defineProps({
     services: {
@@ -31,10 +36,9 @@ const formatCurrency = (value) => {
                         <h2 class="text-2xl font-bold leading-tight text-gray-600">Serviços</h2>
                         <p class="text-sm text-gray-500">Gerencie seus serviços</p>
                     </div>
-                    <Button label="Adicionar Serviço" icon="pi pi-plus" />
+                    <Button label="Adicionar Serviço" icon="pi pi-plus" @click="displayDialog = true" />
                 </div>
             </template>
-
             <DataTable
                 :value="services"
                 :paginator="true"
@@ -57,5 +61,6 @@ const formatCurrency = (value) => {
                 </Column>
             </DataTable>
         </Panel>
+        <CreateServiceDialog :visible="displayDialog" @close="displayDialog = false" />
     </AuthenticatedLayout>
 </template>

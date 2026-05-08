@@ -19,8 +19,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/agendamentos', [AppointmentController::class, 'index'])->name('admin.appointments');
     Route::get('/clientes', [ClientController::class, 'index'])->name('admin.clients');
     Route::get('/horarios', [AvailabilityController::class, 'index'])->name('admin.availabilities');
-    Route::get('/servicos', [ServiceController::class, 'index'])->name('admin.services');
 
+    // Rotas para gerenciamento de serviços
+    Route::get('/servicos', [ServiceController::class, 'index'])->name('admin.services.index');
+    Route::post('/servicos', [ServiceController::class, 'store'])->name('admin.services.store');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

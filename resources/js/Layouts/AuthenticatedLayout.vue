@@ -21,7 +21,7 @@ const items = [
     },
     {
         label: 'Serviços',
-        route: 'admin.services',
+        route: 'admin.services.index',
     },
 ];
 </script>
