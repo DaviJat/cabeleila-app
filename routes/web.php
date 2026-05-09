@@ -6,7 +6,6 @@ use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\AvailabilityController;
 use App\Http\Controllers\Admin\ServiceController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 

@@ -7,9 +7,13 @@ import Column from 'primevue/column';
 import Panel from 'primevue/panel';
 import Button from 'primevue/button';
 
-import CreateServiceDialog from './Partials/CreateServiceDialog.vue';
+import ServiceDialog from './Partials/ServiceDialog.vue';
 
+// Estados para controlar a exibição dos diálogos
 const displayDialog = ref(false);
+
+// Armazenar o serviço selecionado para edição
+const selectedService = ref(null);
 
 const props = defineProps({
     services: {
@@ -23,6 +27,12 @@ const formatCurrency = (value) => {
         style: 'currency',
         currency: 'BRL',
     });
+};
+
+// Função para abrir o Dialog
+const openDialog = (service = null) => {
+    selectedService.value = service;
+    displayDialog.value = true;
 };
 </script>
 
@@ -38,7 +48,7 @@ const formatCurrency = (value) => {
                         <p class="text-sm text-gray-500">Gerencie seus serviços</p>
                     </div>
                     <!-- Botão para adicionar serviço -->
-                    <Button label="Adicionar Serviço" icon="pi pi-plus" @click="displayDialog = true" />
+                    <Button label="Adicionar Serviço" icon="pi pi-plus" @click="openDialog()" />
                 </div>
             </template>
             <!-- Conteúdo da tabela -->
@@ -73,14 +83,16 @@ const formatCurrency = (value) => {
                 <Column header="Ações">
                     <template #body="slotProps">
                         <div class="flex items-center gap-2">
-                            <Button label="Editar" icon="pi pi-pencil" variant="outlined" />
-                            <Button label="Excluir" icon="pi pi-trash" variant="outlined" severity="danger" />
+                            <!-- Botão para editar serviço -->
+                            <Button label="Editar" icon="pi pi-pencil" variant="outlined" @click="openDialog(slotProps.data)" />
+                            <!-- Botão para desativar serviço -->
+                            <Button label="Desativar" icon="pi pi-ban" variant="outlined" severity="danger" />
                         </div>
                     </template>
                 </Column>
             </DataTable>
         </Panel>
-        <!-- Diálogo para criar serviço -->
-        <CreateServiceDialog :visible="displayDialog" @close="displayDialog = false" />
+        <!-- Diálogo para criar/editar serviço -->
+        <ServiceDialog :visible="displayDialog" :service="selectedService" @close="displayDialog = false" />
     </AuthenticatedLayout>
 </template>

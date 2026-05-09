@@ -21,6 +21,7 @@ class ServiceController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'id'               => ['nullable', 'integer', 'exists:services,id'], // Adicionamos o ID
             'name'             => ['required', 'string', 'max:255'],
             'description'      => ['required', 'string', 'max:1000'],
             'price'            => ['required', 'numeric', 'min:0'],
@@ -34,8 +35,18 @@ class ServiceController extends Controller
             'duration_minutes.min'      => 'A duração mínima é de 1 minuto.',
         ]);
 
-        Service::create($validated);
+        $id = $request->input('id');
+        // Remove o ID do array de validação para evitar problemas com o updateOrCreate
+        unset($validated['id']);
 
-        return redirect()->back()->with('success', 'Serviço cadastrado com sucesso!');
+        // Se o ID for fornecido, atualiza o serviço existente; caso contrário, cria um novo serviço
+        Service::updateOrCreate(
+            ['id' => $id],
+            $validated
+        );
+
+        $mensagem = $id ? 'Serviço atualizado com sucesso!' : 'Serviço cadastrado com sucesso!';
+
+        return redirect()->back()->with('success', $mensagem);
     }
 }

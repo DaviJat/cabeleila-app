@@ -1,23 +1,50 @@
 <script setup>
+import { watch, computed } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { Dialog, Button, InputText, InputNumber, Textarea, Toast } from 'primevue';
 
 const props = defineProps({
     visible: Boolean,
+    service: {
+        type: Object,
+    },
 });
 
 const toast = useToast();
 const page = usePage();
+const emit = defineEmits(['close']);
+
+// Determina se estamos editando ou criando um serviço
+const isEditing = computed(() => !!props.service?.id);
 
 const form = useForm({
+    id: null,
     name: '',
     description: '',
     price: null,
     duration_minutes: null,
 });
 
-const emit = defineEmits(['close']);
+// Identifica quando o Dialog é aberto
+watch(
+    () => props.visible,
+    (isOpen) => {
+        if (isOpen) {
+            if (props.service) {
+                // Modo Edição: Preenche com os dados do serviço selecionado
+                form.id = props.service.id;
+                form.name = props.service.name;
+                form.description = props.service.description;
+                form.price = Number(props.service.price);
+                form.duration_minutes = Number(props.service.duration_minutes);
+            } else {
+                // Modo Criação: Reseta o formulário
+                form.reset();
+            }
+        }
+    },
+);
 
 const closeDialog = () => {
     form.reset();
@@ -29,7 +56,8 @@ const submit = () => {
     form.post(route('admin.services.store'), {
         onSuccess: () => {
             closeDialog();
-            const mensagem = page.props.flash?.success || 'Serviço cadastrado com sucesso!';
+            const defaultMessage = isEditing.value ? 'Serviço atualizado com sucesso!' : 'Serviço cadastrado com sucesso!';
+            const mensagem = page.props.flash?.success || defaultMessage;
 
             toast.add({
                 severity: 'success',
@@ -45,13 +73,20 @@ const submit = () => {
 <template>
     <Toast />
     <Dialog :visible="visible" @update:visible="closeDialog" modal>
+        <!-- Cabeçalho do Dialog -->
         <template #header>
             <div class="flex flex-col items-start mr-8">
-                <h3 class="text-xl font-bold leading-tight text-gray-600">Adicionar Serviço</h3>
-                <p class="text-sm text-gray-500">Complete os campos para adicionar um novo serviço.</p>
+                <!-- Título e Descrição Dinâmicos -->
+                <h3 class="text-xl font-bold leading-tight text-gray-600">
+                    {{ isEditing ? 'Editar Serviço' : 'Adicionar Serviço' }}
+                </h3>
+                <p class="text-sm text-gray-500">
+                    {{ isEditing ? 'Altere os dados do serviço selecionado.' : 'Complete os campos para adicionar um novo serviço.' }}
+                </p>
             </div>
         </template>
-        <form id="form-servico" @submit.prevent="submit" class="space-y-4">
+        <!-- Conteúdo do Dialog -->
+        <form id="form-servico" @submit.prevent="submit" class="space-y-4 pt-2">
             <!-- Nome do Serviço -->
             <div class="flex flex-col gap-1">
                 <label for="name" class="font-semibold">Nome</label>
@@ -62,7 +97,6 @@ const submit = () => {
             <!-- Descrição do Serviço -->
             <div class="flex flex-col gap-1">
                 <label for="description" class="font-semibold">Descrição</label>
-                <!-- Placeholder alterado para exemplo -->
                 <Textarea
                     id="description"
                     v-model="form.description"
@@ -102,9 +136,12 @@ const submit = () => {
                 </div>
             </div>
         </form>
+        <!-- Rodapé do Dialog -->
         <template #footer>
+            <!-- Botão de Cancelar -->
             <Button label="Cancelar" class="p-button-text" @click="closeDialog()" />
-            <Button label="Salvar" iconPos="right" type="submit" form="form-servico" :loading="form.processing" />
+            <!-- Botão Dinâmico para Criar/Atualizar -->
+            <Button :label="isEditing ? 'Atualizar' : 'Salvar'" iconPos="right" type="submit" form="form-servico" :loading="form.processing" />
         </template>
     </Dialog>
 </template>
