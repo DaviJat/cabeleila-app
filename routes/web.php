@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
     // Rotas para gerenciamento de serviços
     Route::get('/servicos', [ServiceController::class, 'index'])->name('admin.services.index');
     Route::post('/servicos', [ServiceController::class, 'store'])->name('admin.services.store');
+    Route::delete('/servicos/{id}', [ServiceController::class, 'destroy'])->name('admin.services.destroy');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

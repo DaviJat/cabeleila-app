@@ -102,7 +102,7 @@ const submit = () => {
                     v-model="form.description"
                     rows="3"
                     :invalid="!!form.errors.description"
-                    placeholder="Serviço completo de corte com tesoura, incluindo lavagem e finalização"
+                    placeholder="Serviço completo de corte com tesoura, incluindo lavagem e finalização."
                     @update:modelValue="form.clearErrors('description')" />
                 <small v-if="form.errors.description" class="text-red-500">{{ form.errors.description }}</small>
             </div>

@@ -10,6 +10,7 @@ import 'primeicons/primeicons.css'
 import PrimeVue from 'primevue/config';
 import CustomPreset from './preset';
 import ToastService from 'primevue/toastservice';
+import ConfirmationService from 'primevue/confirmationservice';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -43,6 +44,7 @@ createInertiaApp({
                 }
             })
             .use(ToastService)
+            .use(ConfirmationService)
             .mount(el)
             ;
     },

@@ -1,19 +1,18 @@
 <script setup>
 import { ref } from 'vue';
-import { Head } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Panel from 'primevue/panel';
-import Button from 'primevue/button';
+import { Head, router } from '@inertiajs/vue3';
+import { DataTable, Column, Panel, Button, ConfirmDialog, useConfirm } from 'primevue';
 
-import ServiceDialog from './Partials/ServiceDialog.vue';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import ServiceDialog from '@/Pages/Admin/Services/Partials/ServiceDialog.vue';
 
 // Estados para controlar a exibição dos diálogos
 const displayDialog = ref(false);
 
 // Armazenar o serviço selecionado para edição
 const selectedService = ref(null);
+
+const confirm = useConfirm();
 
 const props = defineProps({
     services: {
@@ -34,11 +33,30 @@ const openDialog = (service = null) => {
     selectedService.value = service;
     displayDialog.value = true;
 };
+
+// Função para excluir (desativar) um serviço
+const deleteService = (id) => {
+    confirm.require({
+        header: 'Confirmar Exclusão',
+        message: 'Tem certeza que deseja excluir este serviço?',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Sim, Excluir',
+        rejectLabel: 'Cancelar',
+        rejectProps: { severity: 'secondary', variant: 'outlined' }, // Deixa o botão cancelar mais discreto
+        acceptProps: { severity: 'danger' },
+        accept: () => {
+            router.delete(route('admin.services.destroy', id), {
+                preserveScroll: true,
+            });
+        },
+    });
+};
 </script>
 
 <template>
     <Head title="Serviços" />
     <AuthenticatedLayout>
+        <ConfirmDialog />
         <Panel>
             <!-- Cabeçalho da tabela -->
             <template #header>
@@ -67,17 +85,11 @@ const openDialog = (service = null) => {
                 <Column field="description" header="Descrição" sortable />
                 <!-- Preço -->
                 <Column field="price" header="Preço" sortable bodyStyle="text-align: right">
-                    <template #body="slotProps">
-                        <div class="w-full text-right">
-                            {{ formatCurrency(slotProps.data.price) }}
-                        </div>
-                    </template>
+                    <template #body="slotProps"> {{ formatCurrency(slotProps.data.price) }} </template>
                 </Column>
                 <!-- Duração -->
                 <Column field="duration_minutes" header="Duração" sortable bodyStyle="text-align: right">
-                    <template #body="slotProps">
-                        <div class="w-full text-right">{{ slotProps.data.duration_minutes }} min</div>
-                    </template>
+                    <template #body="slotProps"> {{ slotProps.data.duration_minutes }} min </template>
                 </Column>
                 <!-- Ações -->
                 <Column header="Ações">
@@ -85,8 +97,8 @@ const openDialog = (service = null) => {
                         <div class="flex items-center gap-2">
                             <!-- Botão para editar serviço -->
                             <Button label="Editar" icon="pi pi-pencil" variant="outlined" @click="openDialog(slotProps.data)" />
-                            <!-- Botão para desativar serviço -->
-                            <Button label="Desativar" icon="pi pi-ban" variant="outlined" severity="danger" />
+                            <!-- Botão para excluir serviço -->
+                            <Button label="Excluir" icon="pi pi-trash" variant="outlined" severity="danger" @click="deleteService(slotProps.data.id)" />
                         </div>
                     </template>
                 </Column>

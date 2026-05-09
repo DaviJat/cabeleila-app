@@ -7,6 +7,7 @@ use Database\Factories\ServiceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[Fillable([
@@ -17,8 +18,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 ])]
 class Service extends Model
 {
-    /** @use HasFactory<ServiceFactory> */
-    use HasFactory;
+    /** @use HasFactory, SoftDeletes */
+    use HasFactory, SoftDeletes;
 
     /**
      *  Get the attributes that should be cast.

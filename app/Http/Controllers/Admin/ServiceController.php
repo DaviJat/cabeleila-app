@@ -49,4 +49,14 @@ class ServiceController extends Controller
 
         return redirect()->back()->with('success', $mensagem);
     }
+
+    public function destroy(int $id)
+    {
+        $service = Service::findOrFail($id);
+
+        // Preenche a coluna deleted_at (Soft Delete)
+        $service->delete();
+
+        return redirect()->back()->with('success', 'Serviço excluído com sucesso!');
+    }
 }
