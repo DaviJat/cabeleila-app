@@ -45,7 +45,7 @@ const deleteService = (id) => {
         rejectProps: { severity: 'secondary', variant: 'outlined' }, // Deixa o botão cancelar mais discreto
         acceptProps: { severity: 'danger' },
         accept: () => {
-            router.delete(route('admin.services.destroy', id), {
+            router.delete(route('services.destroy', id), {
                 preserveScroll: true,
             });
         },

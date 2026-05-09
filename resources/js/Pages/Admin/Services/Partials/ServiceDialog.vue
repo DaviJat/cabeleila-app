@@ -53,7 +53,7 @@ const closeDialog = () => {
 };
 
 const submit = () => {
-    form.post(route('admin.services.store'), {
+    form.post(route('services.store'), {
         onSuccess: () => {
             closeDialog();
             const defaultMessage = isEditing.value ? 'Serviço atualizado com sucesso!' : 'Serviço cadastrado com sucesso!';

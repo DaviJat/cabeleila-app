@@ -14,15 +14,15 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/painel', [DashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/agendamentos', [AppointmentController::class, 'index'])->name('admin.appointments');
-    Route::get('/clientes', [ClientController::class, 'index'])->name('admin.clients');
-    Route::get('/horarios', [AvailabilityController::class, 'index'])->name('admin.availabilities');
+    Route::get('/painel', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/agendamentos', [AppointmentController::class, 'index'])->name('appointments');
+    Route::get('/clientes', [ClientController::class, 'index'])->name('clients');
+    Route::get('/horarios', [AvailabilityController::class, 'index'])->name('availabilities');
 
     // Rotas para gerenciamento de serviços
-    Route::get('/servicos', [ServiceController::class, 'index'])->name('admin.services.index');
-    Route::post('/servicos', [ServiceController::class, 'store'])->name('admin.services.store');
-    Route::delete('/servicos/{id}', [ServiceController::class, 'destroy'])->name('admin.services.destroy');
+    Route::get('/servicos', [ServiceController::class, 'index'])->name('services.index');
+    Route::post('/servicos', [ServiceController::class, 'store'])->name('services.store');
+    Route::delete('/servicos/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

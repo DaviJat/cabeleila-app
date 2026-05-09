@@ -5,23 +5,23 @@ import { Menubar, Avatar, Button } from 'primevue';
 const items = [
     {
         label: 'Painel',
-        route: 'admin.dashboard',
+        route: 'dashboard',
     },
     {
         label: 'Agenda',
-        route: 'admin.appointments',
+        route: 'appointments',
     },
     {
         label: 'Clientes',
-        route: 'admin.clients',
+        route: 'clients',
     },
     {
         label: 'Horários',
-        route: 'admin.availabilities',
+        route: 'availabilities',
     },
     {
         label: 'Serviços',
-        route: 'admin.services.index',
+        route: 'services.index',
     },
 ];
 </script>
