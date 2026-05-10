@@ -4,6 +4,7 @@ import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
 import { Head } from '@inertiajs/vue3';
+import { Panel } from 'primevue';
 
 defineProps({
     mustVerifyEmail: {
@@ -16,41 +17,36 @@ defineProps({
 </script>
 
 <template>
-    <Head title="Profile" />
-
+    <Head title="Meu Perfil" />
     <AuthenticatedLayout>
-        <template #header>
-            <h2
-                class="text-xl font-semibold leading-tight text-gray-800"
-            >
-                Profile
-            </h2>
-        </template>
-
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-                <div
-                    class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
-                >
-                    <UpdateProfileInformationForm
-                        :must-verify-email="mustVerifyEmail"
-                        :status="status"
-                        class="max-w-xl"
-                    />
+        <Panel>
+            <!-- Cabeçalho -->
+            <template #header>
+                <div class="flex justify-between items-center w-full px-2">
+                    <div class="flex flex-col items-start">
+                        <h2 class="text-2xl font-bold leading-tight text-gray-600">Meu Perfil</h2>
+                        <p class="text-sm text-gray-500">Gerencie suas informações pessoais e segurança da conta</p>
+                    </div>
                 </div>
+            </template>
+            <!-- Container dos formulários -->
+            <div class="flex flex-col gap-8 p-2 sm:p-6 border">
+                <section class="max-w-xl">
+                    <UpdateProfileInformationForm :must-verify-email="mustVerifyEmail" :status="status" />
+                </section>
 
-                <div
-                    class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
-                >
-                    <UpdatePasswordForm class="max-w-xl" />
-                </div>
+                <hr class="border-gray-200" />
 
-                <div
-                    class="bg-white p-4 shadow sm:rounded-lg sm:p-8"
-                >
-                    <DeleteUserForm class="max-w-xl" />
-                </div>
+                <section class="max-w-xl">
+                    <UpdatePasswordForm />
+                </section>
+
+                <hr class="border-gray-200" />
+
+                <section class="max-w-xl">
+                    <DeleteUserForm />
+                </section>
             </div>
-        </div>
+        </Panel>
     </AuthenticatedLayout>
 </template>
