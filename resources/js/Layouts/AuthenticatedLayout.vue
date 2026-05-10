@@ -17,7 +17,7 @@ const items = [
     },
     {
         label: 'Horários',
-        route: 'availabilities',
+        route: 'availabilities.index',
     },
     {
         label: 'Serviços',

@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Client;
 use App\Models\Service;
-use App\Models\Appointment;
 use App\Models\Availability;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -31,11 +30,11 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
         ]);
 
-        // Criação de usuários secundários para testes de permissão
-        User::factory(2)->create();
+        // Criação de usuários secundários para testes de permissão (por enquanto comentado para simular um cenário inicial com apenas o administrador)
+        // User::factory(2)->create();
 
         // Definição do catálogo de serviços com escopo real de descrições, preços e durações
-        $services = Service::factory()
+        Service::factory()
             ->count(8)
             ->state(new Sequence(
                 [
@@ -89,15 +88,14 @@ class DatabaseSeeder extends Seeder
             ))
             ->create();
 
-        // Geração da base de clientes fictícios
-        $clients = Client::factory(50)->create();
+        // Geração da base de clientes fictícios (por enquanto comentado para simular um cenário inicial sem clientes)
+        // Client::factory(50)->create();
 
-        // Configuração do período de geração: Primeiro dia do mês atual até o último dia do mês seguinte
-        $today = Carbon::today();
-        $startDate = $today->copy()->startOfMonth();
-        $endDate = $today->copy()->addMonth()->endOfMonth();
+        // Configuração do período de geração: Primeiro ao último dia do mês ATUAL
+        $startDate = Carbon::now()->startOfMonth();
+        $endDate = Carbon::now()->endOfMonth();
 
-        // Iteração diária para montagem da grade de horários e agendamentos
+        // Iteração diária para montagem da grade de horários
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
 
             // Regra de negócio: Salão não tem expediente aos domingos
@@ -118,55 +116,12 @@ class DatabaseSeeder extends Seeder
 
             foreach ($hours as $hour) {
                 // Registro do horário (slot) na tabela de disponibilidades
-                $availability = Availability::create([
+                // Todos os horários inseridos são marcados como disponíveis
+                Availability::create([
                     'date' => $date->format('Y-m-d'),
                     'hour' => $hour . ':00',
                     'is_available' => true,
                 ]);
-
-                // Simulação da taxa de ocupação: Maior probabilidade no mês vigente, menor no mês seguinte
-                $ocupationChance = 0;
-                if ($date->month === $today->month) {
-                    $ocupationChance = 75;
-                } elseif ($date->month === $today->copy()->addMonth()->month) {
-                    $ocupationChance = 30;
-                }
-
-                // Efetivação do agendamento mediante a probabilidade calculada
-                if (rand(1, 100) <= $ocupationChance) {
-
-                    // Determinação contextual do status do agendamento
-                    $status = 'pending';
-                    if ($date->lt($today)) {
-                        $status = 'completed';
-                    } elseif ($date->eq($today)) {
-                        $status = rand(1, 100) <= 80 ? 'confirmed' : 'pending';
-                    } else {
-                        $status = rand(1, 100) <= 50 ? 'confirmed' : 'pending';
-
-                        // Simulação de taxa de cancelamento prévio para datas futuras (5% de chance)
-                        if (rand(1, 100) <= 5) {
-                            $status = 'canceled';
-                        }
-                    }
-
-                    // Vínculo do agendamento a um cliente aleatório
-                    $appointment = Appointment::factory()->create([
-                        'client_id' => $clients->random()->id,
-                        'availability_id' => $availability->id,
-                        'status' => $status,
-                    ]);
-
-                    // Associação da tabela pivot (Appointment x Service) com 1 a 2 serviços
-                    $appointment->services()->attach(
-                        $services->random(rand(1, 2))->pluck('id')->toArray()
-                    );
-
-                    // Bloqueio da disponibilidade caso o agendamento esteja ativo
-                    if ($status !== 'canceled') {
-                        $availability->update(['is_available' => false]);
-                    }
-                }
             }
         }
     }

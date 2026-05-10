@@ -42,7 +42,7 @@ const deleteService = (id) => {
         icon: 'pi pi-exclamation-triangle',
         acceptLabel: 'Sim, Excluir',
         rejectLabel: 'Cancelar',
-        rejectProps: { severity: 'secondary', variant: 'outlined' }, // Deixa o botão cancelar mais discreto
+        rejectProps: { severity: 'secondary', variant: 'outlined' },
         acceptProps: { severity: 'danger' },
         accept: () => {
             router.delete(route('services.destroy', id), {

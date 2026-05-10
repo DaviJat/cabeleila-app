@@ -17,12 +17,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/painel', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/agendamentos', [AppointmentController::class, 'index'])->name('appointments');
     Route::get('/clientes', [ClientController::class, 'index'])->name('clients');
-    Route::get('/horarios', [AvailabilityController::class, 'index'])->name('availabilities');
+
 
     // Rotas para gerenciamento de serviços
     Route::get('/servicos', [ServiceController::class, 'index'])->name('services.index');
     Route::post('/servicos', [ServiceController::class, 'store'])->name('services.store');
     Route::delete('/servicos/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
+
+    // Rotas para gerenciamento de horários
+    Route::get('/horarios', [AvailabilityController::class, 'index'])->name('availabilities.index');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
