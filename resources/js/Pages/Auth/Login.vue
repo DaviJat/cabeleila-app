@@ -1,7 +1,6 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
-// Adicionado Dialog à importação
 import { InputText, Password, Checkbox, Button, Dialog } from 'primevue';
 
 const form = useForm({
@@ -29,8 +28,8 @@ onMounted(() => {
 </script>
 
 <template>
-    <Head title="Entrar - Cabeleila" />
-
+    <Head title="Entrar" />
+    <!-- Container principal com fundo e layout flexível -->
     <div class="min-h-screen flex font-sans text-gray-800 overflow-hidden bg-[#FAF8F5]/80 backdrop-blur-[2px]">
         <div
             class="absolute top-8 left-6 sm:left-12 xl:left-24 z-30 transition-all duration-1000 ease-out delay-500"
@@ -42,7 +41,7 @@ onMounted(() => {
                 Voltar ao site
             </Link>
         </div>
-
+        <!-- Seção de login com imagem de fundo e formulário -->
         <div
             class="flex-1 flex flex-col justify-center py-12 px-6 sm:px-12 lg:flex-none lg:w-1/2 xl:px-24 relative z-10 transition-all duration-1000 ease-out bg-[url('/images/background-hero.png')] bg-cover bg-center lg:bg-none lg:bg-[#FAF8F5]"
             :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'">
@@ -50,13 +49,14 @@ onMounted(() => {
                 <div class="flex items-center gap-3 mb-10">
                     <img src="/images/logo-cabeleila.svg" alt="Logo Cabeleila" class="h-10 w-auto object-contain" />
                 </div>
-
+                <!-- Formulário de login -->
                 <h2 class="text-3xl font-bold leading-tight">Bem-vinda de volta</h2>
                 <p class="mt-2 text-sm text-gray-600 mb-8">Por favor, insira seus dados para acessar sua conta.</p>
 
                 <form @submit.prevent="submit" class="flex flex-col gap-6">
-                    <div class="flex flex-col gap-2">
-                        <label for="email" class="font-bold text-sm">E-mail</label>
+                    <!-- E-mail -->
+                    <div class="flex flex-col gap-1">
+                        <label for="email" class="font-semibold text-sm">E-mail</label>
                         <InputText
                             id="email"
                             v-model="form.email"
@@ -64,12 +64,13 @@ onMounted(() => {
                             class="w-full !p-3 shadow-sm"
                             placeholder="exemplo@email.com"
                             :invalid="!!form.errors.email"
+                            @update:modelValue="form.clearErrors('email')"
                             required />
-                        <small v-if="form.errors.email" class="text-red-500 ml-2 text-xs">{{ form.errors.email }}</small>
+                        <small v-if="form.errors.email" class="text-red-500">{{ form.errors.email }}</small>
                     </div>
-
-                    <div class="flex flex-col gap-2">
-                        <label for="password" class="font-bold text-sm">Senha</label>
+                    <!-- Senha -->
+                    <div class="flex flex-col gap-1">
+                        <label for="password" class="font-semibold text-sm">Senha</label>
                         <Password
                             id="password"
                             v-model="form.password"
@@ -79,24 +80,24 @@ onMounted(() => {
                             inputClass="w-full !p-3 shadow-sm"
                             placeholder="••••••••"
                             :invalid="!!form.errors.password"
+                            @update:modelValue="form.clearErrors('password')"
                             required />
-                        <small v-if="form.errors.password" class="text-red-500 ml-2 text-xs">{{ form.errors.password }}</small>
+                        <small v-if="form.errors.password" class="text-red-500">{{ form.errors.password }}</small>
                     </div>
-
-                    <div class="flex items-center justify-between">
+                    <!-- Lembrar-me e Esqueci minha senha -->
+                    <div class="flex items-center justify-between mt-2">
                         <div class="flex items-center gap-2">
                             <Checkbox v-model="form.remember" inputId="remember" binary />
                             <label for="remember" class="text-sm font-medium text-gray-700 cursor-pointer">Lembrar-me</label>
                         </div>
-
                         <Button @click="showDialog = true" class="!p-0 hover:underline" variant="link">Esqueceu a senha?</Button>
                     </div>
-
-                    <Button type="submit" label="Entrar na Conta" class="w-full !rounded-full !py-3.5 !font-bold shadow-md" :loading="form.processing" />
+                    <!-- Botão de submit -->
+                    <Button type="submit" label="Entrar na Conta" class="w-full !rounded-full !py-3.5 !font-bold shadow-md mt-2" :loading="form.processing" />
                 </form>
             </div>
         </div>
-
+        <!-- Seção de imagem lateral para telas grandes -->
         <div
             class="hidden lg:block relative w-0 flex-1 bg-gray-900 transition-all duration-1000 delay-200 ease-out"
             :class="isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'">
@@ -111,7 +112,7 @@ onMounted(() => {
                 </blockquote>
             </div>
         </div>
-
+        <!-- Dialog para recuperação de senha -->
         <Dialog v-model:visible="showDialog" modal header="Recuperação de Acesso" :style="{ width: '25rem' }" class="font-sans">
             <div class="flex flex-col gap-4">
                 <p class="text-gray-600 text-justify leading-relaxed">Para redefinir sua senha, por favor entre em contato com o <strong>desenvolvedor do projeto</strong>.</p>

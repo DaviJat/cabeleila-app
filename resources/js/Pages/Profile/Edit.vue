@@ -4,23 +4,14 @@ import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
 import { Head } from '@inertiajs/vue3';
-import { Panel } from 'primevue';
-
-defineProps({
-    mustVerifyEmail: {
-        type: Boolean,
-    },
-    status: {
-        type: String,
-    },
-});
+import { Panel, Toast } from 'primevue';
 </script>
 
 <template>
     <Head title="Meu Perfil" />
     <AuthenticatedLayout>
+        <Toast />
         <Panel>
-            <!-- Cabeçalho -->
             <template #header>
                 <div class="flex justify-between items-center w-full px-2">
                     <div class="flex flex-col items-start">
@@ -29,20 +20,18 @@ defineProps({
                     </div>
                 </div>
             </template>
-            <!-- Container dos formulários -->
-            <div class="flex flex-col gap-8 p-2 sm:p-6 border">
+            <div class="flex flex-col gap-8 p-2 sm:p-6">
+                <!-- Seção de atualização de informações do perfil -->
                 <section class="max-w-xl">
-                    <UpdateProfileInformationForm :must-verify-email="mustVerifyEmail" :status="status" />
+                    <UpdateProfileInformationForm />
                 </section>
-
                 <hr class="border-gray-200" />
-
+                <!-- Seção de atualização de senha -->
                 <section class="max-w-xl">
                     <UpdatePasswordForm />
                 </section>
-
                 <hr class="border-gray-200" />
-
+                <!-- Seção de exclusão de conta -->
                 <section class="max-w-xl">
                     <DeleteUserForm />
                 </section>

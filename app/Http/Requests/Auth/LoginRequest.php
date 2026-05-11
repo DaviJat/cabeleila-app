@@ -34,6 +34,18 @@ class LoginRequest extends FormRequest
     }
 
     /**
+     * Mensagens de erro personalizadas.
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required'    => 'O e-mail é obrigatório.',
+            'email.email'       => 'Digite um e-mail válido.',
+            'password.required' => 'A senha é obrigatória.',
+        ];
+    }
+
+    /**
      * Attempt to authenticate the request's credentials.
      *
      * @throws ValidationException
@@ -46,7 +58,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => 'E-mail ou senha incorretos.',
             ]);
         }
 
@@ -69,10 +81,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'email' => 'Muitas tentativas de login. Por favor, tente novamente em ' . ceil($seconds / 60) . ' minutos.',
         ]);
     }
 
@@ -81,6 +90,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
     }
 }
