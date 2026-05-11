@@ -71,8 +71,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Toast />
-    <Dialog :visible="visible" @update:visible="closeDialog" modal>
+    <Dialog :visible="visible" @update:visible="closeDialog" modal class="mx-4">
         <!-- Cabeçalho do Dialog -->
         <template #header>
             <div class="flex flex-col items-start mr-8">
@@ -106,7 +105,7 @@ const submit = () => {
                     @update:modelValue="form.clearErrors('description')" />
                 <small v-if="form.errors.description" class="text-red-500">{{ form.errors.description }}</small>
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Preço do Serviço -->
                 <div class="flex flex-col gap-1">
                     <label for="price" class="font-semibold">Preço</label>

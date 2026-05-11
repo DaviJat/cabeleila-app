@@ -10,7 +10,6 @@ import { Panel, Toast } from 'primevue';
 <template>
     <Head title="Meu Perfil" />
     <AuthenticatedLayout>
-        <Toast />
         <Panel>
             <template #header>
                 <div class="flex justify-between items-center w-full px-2">

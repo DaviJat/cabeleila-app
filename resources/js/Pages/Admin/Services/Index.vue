@@ -56,17 +56,17 @@ const deleteService = (id) => {
 <template>
     <Head title="Serviços" />
     <AuthenticatedLayout>
-        <ConfirmDialog />
-        <Panel>
+        <ConfirmDialog class="mx-4" />
+        <Panel :pt="{ contentWrapper: 'overflow-x-auto' }">
             <!-- Cabeçalho da tabela -->
             <template #header>
-                <div class="flex justify-between items-center w-full px-2">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full px-2 gap-4">
                     <div class="flex flex-col items-start">
                         <h2 class="text-2xl font-bold leading-tight text-gray-600">Serviços</h2>
                         <p class="text-sm text-gray-500">Gerencie seus serviços</p>
                     </div>
                     <!-- Botão para adicionar serviço -->
-                    <Button label="Adicionar Serviço" icon="pi pi-plus" @click="openDialog()" />
+                    <Button label="Adicionar Serviço" icon="pi pi-plus" class="w-full sm:w-auto" @click="openDialog()" />
                 </div>
             </template>
             <!-- Conteúdo da tabela -->
@@ -77,12 +77,12 @@ const deleteService = (id) => {
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                 stripedRows
                 class="border-x border-t">
-                <!-- ID -->
-                <Column field="id" header="Código" sortable />
+                <!-- ID (escondido para telas pequenas) -->
+                <Column field="id" header="Código" sortable class="hidden sm:table-cell" />
                 <!-- Nome -->
                 <Column field="name" header="Nome" sortable />
-                <!-- Descrição -->
-                <Column field="description" header="Descrição" sortable />
+                <!-- Descrição (escondido para telas pequenas) -->
+                <Column field="description" header="Descrição" sortable class="hidden sm:table-cell" />
                 <!-- Preço -->
                 <Column field="price" header="Preço" sortable bodyStyle="text-align: right">
                     <template #body="slotProps"> {{ formatCurrency(slotProps.data.price) }} </template>
@@ -91,14 +91,21 @@ const deleteService = (id) => {
                 <Column field="duration_minutes" header="Duração" sortable bodyStyle="text-align: right">
                     <template #body="slotProps"> {{ slotProps.data.duration_minutes }} min </template>
                 </Column>
-                <!-- Ações -->
                 <Column header="Ações">
                     <template #body="slotProps">
                         <div class="flex items-center gap-2">
-                            <!-- Botão para editar serviço -->
-                            <Button label="Editar" icon="pi pi-pencil" variant="outlined" @click="openDialog(slotProps.data)" />
-                            <!-- Botão para excluir serviço -->
-                            <Button label="Excluir" icon="pi pi-trash" variant="outlined" severity="danger" @click="deleteService(slotProps.data.id)" />
+                            <!-- Botão de editar -->
+                            <Button icon="pi pi-pencil" variant="outlined" class="sm:!hidden" aria-label="Editar" @click="openDialog(slotProps.data)" />
+                            <Button label="Editar" icon="pi pi-pencil" variant="outlined" class="!hidden sm:!inline-flex" @click="openDialog(slotProps.data)" />
+                            <!-- Botão de excluir (desativar) -->
+                            <Button icon="pi pi-trash" variant="outlined" severity="danger" class="sm:!hidden" aria-label="Excluir" @click="deleteService(slotProps.data.id)" />
+                            <Button
+                                label="Excluir"
+                                icon="pi pi-trash"
+                                variant="outlined"
+                                severity="danger"
+                                class="!hidden sm:!inline-flex"
+                                @click="deleteService(slotProps.data.id)" />
                         </div>
                     </template>
                 </Column>

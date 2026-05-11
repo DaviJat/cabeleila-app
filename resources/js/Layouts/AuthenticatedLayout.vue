@@ -1,7 +1,24 @@
 <script setup>
-import { ref } from 'vue';
-import { Menubar, Avatar, Button, Menu } from 'primevue';
+import { ref, onMounted, onUnmounted } from 'vue';
+import { Menubar, Avatar, Button, Menu, Toast } from 'primevue'; // <-- Toast adicionado aqui
 import { router } from '@inertiajs/vue3';
+
+// Lógica para Toast Responsivo
+const toastPosition = ref('top-right');
+
+const updateToastPosition = () => {
+    // Se a tela for menor que 768px (mobile), fica no centro. Senão, na direita.
+    toastPosition.value = window.innerWidth < 768 ? 'top-center' : 'top-right';
+};
+
+onMounted(() => {
+    updateToastPosition();
+    window.addEventListener('resize', updateToastPosition);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('resize', updateToastPosition);
+});
 
 // Definindo os itens do menu de navegação
 const items = [
@@ -51,6 +68,7 @@ const handleNavigation = (item) => {
 </script>
 
 <template>
+    <Toast :position="toastPosition" />
     <div class="min-h-screen flex flex-col bg-[#faf8f5]">
         <div class="max-w-7xl w-full mx-auto flex flex-col px-4 sm:px-6 lg:px-8 gap-6 py-4 md:py-6">
             <header>
