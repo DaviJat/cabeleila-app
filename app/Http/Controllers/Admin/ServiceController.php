@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ServiceRequest;
+use App\Http\Requests\Admin\ServiceRequest;
 use App\Models\Service;
 use Inertia\Inertia;
 
@@ -18,7 +18,7 @@ class ServiceController extends Controller
         ]);
     }
 
-    // Injetamos o ServiceRequest aqui no lugar do Request padrão
+    // Cria ou atualiza um serviço
     public function store(ServiceRequest $request)
     {
         // Valida os dados usando as regras definidas no SaveServiceRequest

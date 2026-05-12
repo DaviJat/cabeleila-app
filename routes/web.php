@@ -26,6 +26,8 @@ Route::middleware('auth')->group(function () {
 
     // Rotas para gerenciamento de horários
     Route::get('/horarios', [AvailabilityController::class, 'index'])->name('availabilities.index');
+    Route::post('/horarios', [AvailabilityController::class, 'store'])->name('availabilities.store');
+    Route::delete('/horarios/{id}', [AvailabilityController::class, 'destroy'])->name('availabilities.destroy');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

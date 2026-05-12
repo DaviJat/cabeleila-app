@@ -6,7 +6,7 @@ import { DataTable, Column, Panel, Button, ConfirmDialog, useConfirm } from 'pri
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import ServiceDialog from '@/Pages/Admin/Services/Partials/ServiceDialog.vue';
 
-// Estados para controlar a exibição dos diálogos
+// Estados para controlar a exibição dos Dialogs
 const displayDialog = ref(false);
 
 // Armazenar o serviço selecionado para edição
@@ -30,7 +30,7 @@ const formatCurrency = (value) => {
 
 // Função para abrir o Dialog
 const openDialog = (service = null) => {
-    selectedService.value = service;
+    selectedService.value = service; // Armazena o serviço selecionado para edição (ou null para criação)
     displayDialog.value = true;
 };
 
