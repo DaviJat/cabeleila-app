@@ -39,11 +39,19 @@ watch(
                 // Converte a string de hora (ex: "14:30:00") para um objeto Date para o DatePicker
                 const [hours, minutes] = props.availability.hour.split(':');
                 const dateObj = new Date();
-                dateObj.setHours(parseInt(hours), parseInt(minutes), 0);
+                dateObj.setHours(parseInt(hours), parseInt(minutes), 0, 0);
                 form.hour = dateObj;
             } else {
-                // Modo Criação: Reseta o formulário
+                // Modo Criação: Reseta o formulário e pré-seleciona a hora arredondada
                 form.reset();
+
+                const now = new Date();
+                // Lógica para arredondar: se for menor que 30 vira 0, se for 30 ou mais vira 30
+                const roundedMinutes = now.getMinutes() < 30 ? 0 : 30;
+
+                now.setMinutes(roundedMinutes);
+                now.setSeconds(0, 0);
+                form.hour = now;
             }
         }
     },
@@ -87,26 +95,15 @@ const submit = () => {
                 life: 3000,
             });
         },
-        onError: (errors) => {
-            // Prioriza erros específicos de data e hora, depois mensagens genéricas do backend, e por fim uma mensagem padrão
-            const mensagem = errors.date || errors.hour || page.props.flash?.error || 'Verifique os dados preenchidos.';
-
-            toast.add({
-                severity: 'error',
-                summary: 'Atenção',
-                detail: mensagem,
-                life: 5000,
-            });
-        },
     });
 };
 </script>
 
 <template>
     <Dialog :visible="visible" @update:visible="closeDialog" modal class="mx-4 w-full max-w-lg">
-        <!-- Cabeçalho do Dialog -->
         <template #header>
             <div class="flex flex-col items-start mr-8">
+                <!-- Título e Descrição Dinâmicos -->
                 <h3 class="text-xl font-bold leading-tight text-gray-600">
                     {{ isEditing ? 'Editar Horário' : 'Adicionar Horário' }}
                 </h3>
@@ -119,6 +116,7 @@ const submit = () => {
         </template>
         <!-- Conteúdo do Dialog -->
         <form id="form-horario" @submit.prevent="submit" class="space-y-4 pt-2">
+            <!-- Horário -->
             <div class="flex flex-col gap-1">
                 <label for="hour" class="font-semibold text-gray-700">Hora do Atendimento</label>
                 <DatePicker
@@ -133,13 +131,15 @@ const submit = () => {
                     :invalid="!!form.errors.hour"
                     @update:modelValue="form.clearErrors('hour')" />
                 <small v-if="form.errors.hour" class="text-red-500">{{ form.errors.hour }}</small>
+                <small v-if="form.errors.date" class="text-red-500">{{ form.errors.date }}</small>
                 <p class="text-xs text-gray-400 mt-1">Selecione a hora e os minutos em que o profissional estará livre.</p>
             </div>
         </form>
-        <!-- Rodapé do Dialog -->
+        <!-- Rodapé do diálogo -->
         <template #footer>
+            <!-- Botão de Cancelar -->
             <Button label="Cancelar" variant="text" class="p-button-text" @click="closeDialog()" />
-            <!-- Mantendo o botão dinâmico para salvar ou atualizar -->
+            <!-- Botão Dinâmico para Criar/Atualizar -->
             <Button :label="isEditing ? 'Atualizar' : 'Salvar'" iconPos="right" type="submit" form="form-horario" :loading="form.processing" />
         </template>
     </Dialog>

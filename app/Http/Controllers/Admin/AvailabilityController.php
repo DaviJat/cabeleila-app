@@ -11,7 +11,9 @@ class AvailabilityController extends Controller
 {
     public function index()
     {
-        $availabilities = Availability::orderBy('id')->get();
+        $availabilities = Availability::orderBy('date')
+            ->orderBy('hour', 'asc')
+            ->get();
 
         return Inertia::render('Admin/Availabilities/Index', [
             'availabilities' => $availabilities
