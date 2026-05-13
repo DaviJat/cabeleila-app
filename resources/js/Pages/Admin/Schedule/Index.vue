@@ -5,28 +5,25 @@ import { DatePicker, Panel, Button, Tag, ConfirmDialog, useConfirm } from 'prime
 import { formatTime } from '@/Utils/formatters';
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import AvailabilityDialog from '@/Pages/Admin/Availabilities/Partials/AvailabilityDialog.vue';
+import SlotManagerDialog from '@/Pages/Admin/Schedule/Partials/SlotManagerDialog.vue';
 
-const confirm = useConfirm(); // Inicializar confirm
+const confirm = useConfirm();
 
-// Estados para controlar a exibição dos diálogos
 const displayDialog = ref(false);
 const selectedAvailability = ref(null);
 
-const props = defineProps({
-    availabilities: {
-        type: Array,
-        required: true,
-    },
-});
-
-// Função para abrir o Dialog
 const openDialog = (availability = null) => {
-    selectedAvailability.value = availability; // Armazena a disponibilidade selecionada para edição
+    selectedAvailability.value = availability;
     displayDialog.value = true;
 };
 
-// Função para deletar a disponibilidade
+// Recebendo Clients e Services da Controller
+const props = defineProps({
+    availabilities: { type: Array, required: true },
+    clients: { type: Array, required: true },
+    services: { type: Array, required: true },
+});
+
 const deleteAvailability = (id) => {
     confirm.require({
         header: 'Confirmar Exclusão',
@@ -44,38 +41,26 @@ const deleteAvailability = (id) => {
     });
 };
 
-// Controla a data selecionada no calendário (inicia no dia atual)
 const selectedDate = ref(new Date());
 
-// Computa se a data selecionada é anterior ao dia de hoje (para desabilitar o botão)
 const isPastDate = computed(() => {
     if (!selectedDate.value) return true;
-
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Zera as horas de hoje para comparar apenas os dias
-
+    today.setHours(0, 0, 0, 0);
     const selected = new Date(selectedDate.value);
-    selected.setHours(0, 0, 0, 0); // Zera as horas da data selecionada
-
+    selected.setHours(0, 0, 0, 0);
     return selected < today;
 });
 
-// Computa a data selecionada para o formato do banco (YYYY-MM-DD)
 const selectedDateStr = computed(() => {
     if (!selectedDate.value) return null;
-
-    // O offset previne bugs de fuso horário onde o JS subtrai 1 dia na conversão para ISO
     const offset = selectedDate.value.getTimezoneOffset() * 60000;
     const localDate = new Date(selectedDate.value.getTime() - offset);
-
     return localDate.toISOString().split('T')[0];
 });
 
-// Filtra o array de disponibilidades retornando apenas os horários do dia selecionado
 const dailySlots = computed(() => {
     if (!selectedDateStr.value) return [];
-
-    // Filtra onde a data do slot (ex: 2026-05-01T...) começa com a string YYYY-MM-DD computada acima
     return props.availabilities.filter((slot) => slot.date.startsWith(selectedDateStr.value));
 });
 </script>
@@ -93,31 +78,37 @@ const dailySlots = computed(() => {
                     </div>
                 </div>
             </template>
+
             <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 p-4 md:p-6 border rounded-lg">
                 <div class="flex-none flex justify-center w-full lg:w-auto">
                     <DatePicker v-model="selectedDate" inline class="border-none shadow-sm w-full sm:w-auto" />
                 </div>
+
                 <div class="flex-1 w-full">
                     <div class="pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div class="flex flex-col items-start">
                             <h3 class="text-xl font-semibold text-gray-700">Horários ({{ selectedDate ? selectedDate.toLocaleDateString('pt-BR') : 'selecione uma data' }})</h3>
-                            <p class="text-sm text-gray-500">Clique em um horário para editá-lo ou clique no X para excluí-lo.</p>
+                            <p class="text-sm text-gray-500">Clique no card para gerenciar o horário e fazer agendamentos.</p>
                         </div>
                         <Button label="Adicionar Horário" icon="pi pi-plus" class="w-full sm:w-auto" @click="openDialog()" :disabled="isPastDate" />
                     </div>
+
                     <div
                         v-if="dailySlots.length === 0"
                         class="text-gray-500 flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-2 p-4 bg-gray-50 rounded-md border border-dashed text-center sm:text-left">
                         <i class="pi pi-calendar-times text-2xl sm:text-xl mb-1 sm:mb-0"></i>
                         <span>Nenhum horário cadastrado para este dia.</span>
                     </div>
-                    <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+
+                    <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <!-- CLIQUE GLOBAL DE VOLTA NO CARD -->
                         <div
                             v-for="slot in dailySlots"
-                            @click="slot.is_available ? openDialog(slot) : null"
                             :key="slot.id"
-                            class="relative border rounded-lg p-3 sm:p-4 flex flex-col items-center justify-center gap-2 sm:gap-3 transition-colors"
-                            :class="slot.is_available ? 'bg-white hover:border-primary-400 cursor-pointer' : 'bg-gray-100 opacity-75 cursor-not-allowed'">
+                            @click="openDialog(slot)"
+                            class="relative border rounded-lg p-4 flex flex-col items-center justify-center gap-3 transition-colors h-full min-h-[140px] cursor-pointer"
+                            :class="slot.is_available ? 'bg-white hover:border-primary-400' : 'bg-gray-50 border-gray-200 opacity-90'">
+                            <!-- Botão Excluir (Com .stop para não abrir o modal ao tentar excluir) -->
                             <Button
                                 v-if="slot.is_available"
                                 icon="pi pi-times"
@@ -125,18 +116,29 @@ const dailySlots = computed(() => {
                                 variant="text"
                                 rounded
                                 aria-label="Excluir"
-                                class="!absolute top-1 right-1 !w-8 !h-8 !p-0"
+                                v-tooltip.top="'Excluir Horário'"
+                                class="!absolute top-2 right-2 !w-8 !h-8 !p-0 text-gray-400 hover:text-red-500"
                                 @click.stop="deleteAvailability(slot.id)" />
 
-                            <span class="text-xl sm:text-2xl font-bold text-gray-700 mt-2">
-                                {{ formatTime(slot.hour) }}
-                            </span>
-                            <Tag :severity="slot.is_available ? 'success' : 'secondary'" :value="slot.is_available ? 'Disponível' : 'Indisponível'" rounded />
+                            <!-- Centro do Card -->
+                            <div class="flex flex-col items-center justify-center w-full mt-2">
+                                <span class="text-3xl font-bold text-gray-700">
+                                    {{ formatTime(slot.hour) }}
+                                </span>
+                                <Tag v-if="slot.status_badge" :severity="slot.status_badge.severity" :value="slot.status_badge.label" rounded class="mt-2" />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </Panel>
-        <AvailabilityDialog :visible="displayDialog" :date="selectedDate" :availability="selectedAvailability" @close="displayDialog = false" />
+        <!-- Passando os clientes e serviços para o Dialog -->
+        <SlotManagerDialog
+            :visible="displayDialog"
+            :date="selectedDate"
+            :availability="selectedAvailability"
+            :clients="clients"
+            :services="services"
+            @close="displayDialog = false" />
     </AuthenticatedLayout>
 </template>
