@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Client;
 use App\Models\Service;
 use App\Models\Availability;
+use App\Models\Appointment;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Factories\Sequence;
@@ -29,9 +30,6 @@ class DatabaseSeeder extends Seeder
             'email' => 'leila@example.com',
             'role' => 'admin',
         ]);
-
-        // Criação de usuários secundários para testes de permissão (por enquanto comentado para simular um cenário inicial com apenas o administrador)
-        // User::factory(2)->create();
 
         // Definição do catálogo de serviços com escopo real de descrições, preços e durações
         Service::factory()
@@ -88,12 +86,13 @@ class DatabaseSeeder extends Seeder
             ))
             ->create();
 
-        // Geração da base de clientes fictícios (por enquanto comentado para simular um cenário inicial sem clientes)
-        // Client::factory(50)->create();
+        // Geração da base de clientes fictícios
+        $clients = Client::factory(20)->create();
 
         // Configuração do período de geração: Primeiro ao último dia do mês ATUAL
         $startDate = Carbon::now()->startOfMonth();
         $endDate = Carbon::now()->endOfMonth();
+        $hoje = Carbon::today();
 
         // Iteração diária para montagem da grade de horários
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
@@ -116,12 +115,68 @@ class DatabaseSeeder extends Seeder
 
             foreach ($hours as $hour) {
                 // Registro do horário (slot) na tabela de disponibilidades
-                // Todos os horários inseridos são marcados como disponíveis
-                Availability::create([
+                $availability = Availability::create([
                     'date' => $date->format('Y-m-d'),
                     'hour' => $hour . ':00',
                     'is_available' => true,
                 ]);
+
+                // Geração de agendamentos fictícios apenas entre o começo do mês e a data atual (40% de chance de ocupação)
+                if ($date->lte($hoje) && rand(1, 100) <= 40) {
+
+                    // Simulação de cenário onde um cliente cancelou e outro pegou a vaga (15% de chance dentro dos ocupados)
+                    $isRebooked = rand(1, 100) <= 15;
+
+                    if ($isRebooked) {
+                        // Criação do agendamento antigo (Cancelado)
+                        Appointment::create([
+                            'client_id' => $clients->random()->id,
+                            'availability_id' => $availability->id,
+                            'status' => 'canceled',
+                            'notes' => 'Cliente cancelou com antecedência.',
+                            'created_at' => now()->subDays(3), // Simulando que foi agendado e cancelado no passado
+                            'updated_at' => now()->subDays(2),
+                        ]);
+
+                        // Definição do status do novo cliente que pegou a vaga (Concluído se for no passado, Confirmado se for hoje)
+                        $newStatus = $date->lt($hoje) ? 'completed' : 'confirmed';
+
+                        // Criação do agendamento novo (Ativo)
+                        Appointment::create([
+                            'client_id' => $clients->random()->id,
+                            'availability_id' => $availability->id,
+                            'status' => $newStatus,
+                            'notes' => 'Agendamento de encaixe na vaga que foi cancelada.',
+                            'created_at' => now()->subDays(1), // Simulando que foi criado após o cancelamento do anterior
+                            'updated_at' => now()->subDays(1),
+                        ]);
+
+                        // Atualiza a disponibilidade do horário, pois a vaga foi preenchida novamente
+                        $availability->update(['is_available' => false]);
+                    } else {
+                        // Fluxo normal: apenas 1 agendamento para o horário
+                        if ($date->lt($hoje)) {
+                            // Horários passados: 80% de chance de conclusão, 20% de cancelamento
+                            $status = rand(1, 100) <= 80 ? 'completed' : 'canceled';
+                        } else {
+                            // Horários de hoje: 50% de chance de pendente, 50% de confirmado
+                            $status = rand(1, 100) <= 50 ? 'confirmed' : 'pending';
+                        }
+
+                        // Criação do agendamento vinculado ao cliente e ao horário
+                        Appointment::create([
+                            'client_id' => $clients->random()->id,
+                            'availability_id' => $availability->id,
+                            'status' => $status,
+                            'notes' => 'Agendamento gerado automaticamente pelo sistema.',
+                        ]);
+
+                        // Atualização da disponibilidade do horário caso o agendamento seja mantido
+                        if ($status !== 'canceled') {
+                            $availability->update(['is_available' => false]);
+                        }
+                    }
+                }
             }
         }
     }

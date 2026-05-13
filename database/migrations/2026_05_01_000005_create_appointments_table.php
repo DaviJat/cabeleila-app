@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id')->constrained()->onDelete('cascade');
-            $table->foreignId('availability_id')->unique()->constrained()->onDelete('cascade');
+            $table->foreignId('availability_id')->constrained()->onDelete('cascade');
             $table->string('status')->default('pending'); // pending, confirmed, canceled, completed
             $table->text('notes')->nullable();
             $table->timestamps();

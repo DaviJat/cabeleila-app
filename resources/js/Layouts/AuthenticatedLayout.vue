@@ -23,9 +23,8 @@ onUnmounted(() => {
 // Definindo os itens do menu de navegação
 const items = [
     { label: 'Painel', route: 'dashboard' },
-    { label: 'Agenda', route: 'appointments' },
+    { label: 'Agenda', route: 'schedule.index' },
     { label: 'Clientes', route: 'clients' },
-    { label: 'Horários', route: 'availabilities.index' },
     { label: 'Serviços', route: 'services.index' },
 
     // --- Opções exclusivas do mobile (md:hidden) ---

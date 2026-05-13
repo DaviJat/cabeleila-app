@@ -81,15 +81,15 @@ const dailySlots = computed(() => {
 </script>
 
 <template>
-    <Head title="Horários" />
+    <Head title="Agenda" />
     <AuthenticatedLayout>
         <ConfirmDialog class="mx-4" />
         <Panel>
             <template #header>
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full px-2 gap-4">
                     <div class="flex flex-col items-start">
-                        <h2 class="text-2xl font-bold leading-tight text-gray-600">Horários</h2>
-                        <p class="text-sm text-gray-500">Gerencie seus horários disponíveis</p>
+                        <h2 class="text-2xl font-bold leading-tight text-gray-600">Agenda Geral</h2>
+                        <p class="text-sm text-gray-500">Gerencie a agenda e os agendamentos do salão</p>
                     </div>
                 </div>
             </template>

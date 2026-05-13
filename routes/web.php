@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\AvailabilityController;
+use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\ServiceController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,8 +25,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/servicos', [ServiceController::class, 'store'])->name('services.store');
     Route::delete('/servicos/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
 
+    // Rota para exibir a agenda
+    Route::get('/agenda', [ScheduleController::class, 'index'])->name('schedule.index');
+
     // Rotas para gerenciamento de horários
-    Route::get('/horarios', [AvailabilityController::class, 'index'])->name('availabilities.index');
     Route::post('/horarios', [AvailabilityController::class, 'store'])->name('availabilities.store');
     Route::delete('/horarios/{id}', [AvailabilityController::class, 'destroy'])->name('availabilities.destroy');
 

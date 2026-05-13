@@ -9,17 +9,6 @@ use Inertia\Inertia;
 
 class AvailabilityController extends Controller
 {
-    public function index()
-    {
-        $availabilities = Availability::orderBy('date')
-            ->orderBy('hour', 'asc')
-            ->get();
-
-        return Inertia::render('Admin/Availabilities/Index', [
-            'availabilities' => $availabilities
-        ]);
-    }
-
     // Cria ou atualiza um horário de disponibilidade
     public function store(AvailabilityRequest $request)
     {
