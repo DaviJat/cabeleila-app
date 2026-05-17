@@ -34,9 +34,9 @@ class AvailabilityController extends Controller
     {
         $availability = Availability::findOrFail($id);
 
-        // Horários indisponíveis não podem ser excluídos, pois estão associados a agendamentos
+        // Horários indisponíveis não podem ser excluídos, pois estão associados a agendamentos ou já expiraram
         if (!$availability->is_available) {
-            return redirect()->back()->with('error', 'Este horário não pode ser excluído pois já está associado a um agendamento.');
+            return redirect()->back()->with('error', 'Este horário não pode ser excluído pois já está associado a um agendamento ou já expirou.');
         }
 
         $availability->delete();

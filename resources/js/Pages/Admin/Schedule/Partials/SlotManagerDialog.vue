@@ -3,6 +3,8 @@ import { watch, computed } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { Dialog, Button, DatePicker } from 'primevue';
+import AppointmentForm from '@/Pages/Admin/Schedule/Partials/AppointmentForm.vue';
+import AppointmentHistory from '@/Pages/Admin/Schedule/Partials/AppointmentHistory.vue';
 
 // Props received from the parent component
 const props = defineProps({
@@ -17,12 +19,6 @@ const emit = defineEmits(['close']);
 
 // Determines if the slot is already saved in the database
 const isEditing = computed(() => !!props.availability?.id);
-
-// Checks if the slot is read-only (e.g., Expired or Completed)
-const isBlocked = computed(() => {
-    if (!props.availability) return false;
-    return props.availability.status?.is_blocked === true;
-});
 
 // Form for managing the time slot
 const form = useForm({
@@ -65,8 +61,6 @@ const closeDialog = () => {
 
 // Handles the creation or update of a time slot
 const submitTime = () => {
-    if (isBlocked.value) return;
-
     // Adjust timezone offset to save the correct date
     const offset = props.date.getTimezoneOffset() * 60000;
     const localDate = new Date(props.date.getTime() - offset);
@@ -108,7 +102,7 @@ const submitTime = () => {
                 </p>
             </div>
         </template>
-
+        <!-- Form for create/edit availability slots -->
         <form id="form-horario" @submit.prevent="submitTime" class="space-y-4 pt-2">
             <div class="flex flex-col gap-1">
                 <label for="hour" class="font-semibold text-gray-700 text-sm">Hora do Atendimento</label>
@@ -122,16 +116,28 @@ const submitTime = () => {
                             :stepMinute="30"
                             readonlyInput
                             fluid
-                            :disabled="isBlocked"
+                            :readonly="availability?.status.is_blocked"
                             placeholder="Selecione o horário"
                             :invalid="!!form.errors.hour"
                             @update:modelValue="form.clearErrors('hour')" />
                         <small v-if="form.errors.hour" class="text-red-500 block mt-1">{{ form.errors.hour }}</small>
                         <small v-if="form.errors.date" class="text-red-500 block mt-1">{{ form.errors.date }}</small>
                     </div>
-                    <Button v-if="!isBlocked" :label="isEditing ? 'Atualizar' : 'Salvar'" icon="pi pi-check" type="submit" :loading="form.processing" outlined />
+                    <Button
+                        v-if="!availability?.status.is_blocked"
+                        :label="isEditing ? 'Atualizar' : 'Cadastrar'"
+                        icon="pi pi-check"
+                        type="submit"
+                        :loading="form.processing"
+                        outlined />
                 </div>
             </div>
         </form>
+        <div v-if="isEditing" class="mt-6 border-t pt-4 border-gray-200">
+            <!-- Show Appointment History for blocked slots -->
+            <AppointmentHistory v-if="availability?.status?.is_blocked" :availability="availability" :clients="clients" :services="services" />
+            <!-- Show Appointment Form for available slots -->
+            <AppointmentForm v-else :availability="availability" :clients="clients" :services="services" @close="closeDialog" />
+        </div>
     </Dialog>
 </template>

@@ -13,9 +13,11 @@ const props = defineProps({
 
 const toast = useToast();
 const page = usePage();
+
+// Emit event to parent component to close the dialog
 const emit = defineEmits(['close']);
 
-// Determina se estamos editando ou criando um serviço
+// Determines if we are editing an existing service or creating a new one
 const isEditing = computed(() => !!props.service?.id);
 
 const form = useForm({
@@ -26,32 +28,31 @@ const form = useForm({
     duration_minutes: null,
 });
 
-// Identifica quando o Dialog é aberto
 watch(
     () => props.visible,
     (isOpen) => {
         if (isOpen) {
             if (props.service) {
-                // Modo Edição: Preenche com os dados do serviço selecionado
                 form.id = props.service.id;
                 form.name = props.service.name;
                 form.description = props.service.description;
                 form.price = Number(props.service.price);
                 form.duration_minutes = Number(props.service.duration_minutes);
             } else {
-                // Modo Criação: Reseta o formulário
                 form.reset();
             }
         }
     },
 );
 
+// Closes the dialog and clears validation errors
 const closeDialog = () => {
     form.reset();
     form.clearErrors();
     emit('close');
 };
 
+// Submits the form to create or update a service
 const submit = () => {
     form.post(route('services.store'), {
         onSuccess: () => {
@@ -72,10 +73,10 @@ const submit = () => {
 
 <template>
     <Dialog :visible="visible" @update:visible="closeDialog" modal class="mx-4">
-        <!-- Cabeçalho do Dialog -->
+        <!-- Dialog Header -->
         <template #header>
             <div class="flex flex-col items-start mr-8">
-                <!-- Título e Descrição Dinâmicos -->
+                <!-- Dynamic Title and Description -->
                 <h3 class="text-xl font-bold leading-tight text-gray-600">
                     {{ isEditing ? 'Editar Serviço' : 'Adicionar Serviço' }}
                 </h3>
@@ -84,16 +85,15 @@ const submit = () => {
                 </p>
             </div>
         </template>
-        <!-- Conteúdo do Dialog -->
+        <!-- Dialog Content -->
         <form id="form-servico" @submit.prevent="submit" class="space-y-4 pt-2">
-            <!-- Nome do Serviço -->
+            <!-- Name -->
             <div class="flex flex-col gap-1">
                 <label for="name" class="font-semibold">Nome</label>
-                <!-- Placeholder alterado para exemplo -->
                 <InputText id="name" v-model="form.name" :invalid="!!form.errors.name" placeholder="Corte de Cabelo Masculino" @update:modelValue="form.clearErrors('name')" />
                 <small v-if="form.errors.name" class="text-red-500">{{ form.errors.name }}</small>
             </div>
-            <!-- Descrição do Serviço -->
+            <!-- Description -->
             <div class="flex flex-col gap-1">
                 <label for="description" class="font-semibold">Descrição</label>
                 <Textarea
@@ -106,7 +106,7 @@ const submit = () => {
                 <small v-if="form.errors.description" class="text-red-500">{{ form.errors.description }}</small>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Preço do Serviço -->
+                <!-- Price -->
                 <div class="flex flex-col gap-1">
                     <label for="price" class="font-semibold">Preço</label>
                     <InputNumber
@@ -120,7 +120,7 @@ const submit = () => {
                         @update:modelValue="form.clearErrors('price')" />
                     <small v-if="form.errors.price" class="text-red-500">{{ form.errors.price }}</small>
                 </div>
-                <!-- Duração do Serviço -->
+                <!-- Duration -->
                 <div class="flex flex-col gap-1">
                     <label for="duration" class="font-semibold">Duração (min)</label>
                     <InputNumber
@@ -135,12 +135,12 @@ const submit = () => {
                 </div>
             </div>
         </form>
-        <!-- Rodapé do Dialog -->
+        <!-- Dialog Footer -->
         <template #footer>
-            <!-- Botão de Cancelar -->
+            <!-- Cancel Button -->
             <Button label="Cancelar" class="p-button-text" @click="closeDialog()" />
-            <!-- Botão Dinâmico para Criar/Atualizar -->
-            <Button :label="isEditing ? 'Atualizar' : 'Salvar'" iconPos="right" type="submit" form="form-servico" :loading="form.processing" />
+            <!-- Dynamic Submit Button -->
+            <Button :label="isEditing ? 'Atualizar' : 'Cadastrar'" iconPos="right" type="submit" form="form-servico" :loading="form.processing" />
         </template>
     </Dialog>
 </template>

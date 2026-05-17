@@ -13,7 +13,7 @@ const displayDialog = ref(false);
 const selectedAvailability = ref(null);
 
 const openDialog = (availability = null) => {
-    selectedAvailability.value = availability;
+    selectedAvailability.value = availability; // If availability is null, it will open the dialog in create mode; otherwise, it will be in edit mode
     displayDialog.value = true;
 };
 
@@ -23,6 +23,7 @@ const props = defineProps({
     services: { type: Array, required: true },
 });
 
+// Confirm Dialog for deleting an availability slot
 const deleteAvailability = (id) => {
     confirm.require({
         header: 'Confirmar Exclusão',
@@ -40,8 +41,10 @@ const deleteAvailability = (id) => {
     });
 };
 
+// State for selected date in the DatePicker
 const selectedDate = ref(new Date());
 
+// Used to disable Add Availability Button for past dates
 const isPastDate = computed(() => {
     if (!selectedDate.value) return true;
     const today = new Date();
@@ -51,6 +54,7 @@ const isPastDate = computed(() => {
     return selected < today;
 });
 
+// Converts selectedDate to 'YYYY-MM-DD' format for comparison with slot dates
 const selectedDateStr = computed(() => {
     if (!selectedDate.value) return null;
     const offset = selectedDate.value.getTimezoneOffset() * 60000;
@@ -58,6 +62,7 @@ const selectedDateStr = computed(() => {
     return localDate.toISOString().split('T')[0];
 });
 
+// Filters availabilities to show only those matching the selected date
 const dailySlots = computed(() => {
     if (!selectedDateStr.value) return [];
     return props.availabilities.filter((slot) => slot.date.startsWith(selectedDateStr.value));
@@ -89,6 +94,7 @@ const dailySlots = computed(() => {
                             <h3 class="text-xl font-semibold text-gray-700">Horários ({{ selectedDate ? selectedDate.toLocaleDateString('pt-BR') : 'selecione uma data' }})</h3>
                             <p class="text-sm text-gray-500">Clique no card para gerenciar o horário e fazer agendamentos.</p>
                         </div>
+                        <!-- Add Availability Button -->
                         <Button label="Adicionar Horário" icon="pi pi-plus" class="w-full sm:w-auto" @click="openDialog()" :disabled="isPastDate" />
                     </div>
                     <!-- No Slots Message -->
@@ -113,7 +119,6 @@ const dailySlots = computed(() => {
                                 variant="text"
                                 rounded
                                 aria-label="Excluir"
-                                v-tooltip.top="'Excluir Horário'"
                                 class="!absolute top-2 right-2 !w-8 !h-8 !p-0 text-gray-400 hover:text-red-500"
                                 @click.stop="deleteAvailability(slot.id)" />
                             <div class="flex flex-col items-center justify-center w-full mt-2">
@@ -127,6 +132,7 @@ const dailySlots = computed(() => {
                 </div>
             </div>
         </Panel>
+        <!-- Dialog for create/edit availability slots -->
         <SlotManagerDialog
             :visible="displayDialog"
             :date="selectedDate"
