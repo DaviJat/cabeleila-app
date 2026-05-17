@@ -2,26 +2,23 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Attributes\Description;
-use Illuminate\Console\Attributes\Signature;
 use App\Models\Availability;
 use App\Models\Appointment;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 
-#[Signature('app:cleanup-past-availabilities')]
-#[Description('Atualiza status de agendamentos passados e bloqueia horários expirados')]
+#[Signature('app:cleanup-past-events')]
+#[Description('Automates the status of past availabilities and appointments')]
 class CleanupPastAvailabilities extends Command
 {
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         $now = Carbon::now();
 
-        // Reutiliza a lógica de verificação de horários passados
-        $pastTimeRule = function ($query) use ($now) {
+        // Chronological rule to identify what is in the past
+        $pastCondition = function ($query) use ($now) {
             $query->where('date', '<', $now->toDateString())
                 ->orWhere(function ($q) use ($now) {
                     $q->where('date', '=', $now->toDateString())
@@ -29,25 +26,25 @@ class CleanupPastAvailabilities extends Command
                 });
         };
 
-        // Passo 1: Atualiza agendamentos "pendentes" em horários que já passaram para "cancelados"
-        $canceledCount = Appointment::where('status', 'pending')
-            ->whereHas('availability', $pastTimeRule)
+        // 1. Pending becomes Canceled (Expired)
+        $canceled = Appointment::where('status', 'pending')
+            ->whereHas('availability', $pastCondition)
             ->update(['status' => 'canceled']);
 
-        // Passo 2: Atualiza agendamentos "confirmados" em horários que já passaram para "finalizados"
-        $completedCount = Appointment::where('status', 'confirmed')
-            ->whereHas('availability', $pastTimeRule)
+        // 2. Confirmed becomes Completed automatically
+        $realized = Appointment::where('status', 'confirmed')
+            ->whereHas('availability', $pastCondition)
             ->update(['status' => 'completed']);
 
-        // Passo 3: Garante que qualquer horário passado sem agendamento seja bloqueado
-        $affectedSlots = Availability::where('is_available', true)
-            ->where($pastTimeRule)
+        // 3. Past free slots are blocked
+        $disabledSlots = Availability::where('is_available', true)
+            ->where($pastCondition)
             ->update(['is_available' => false]);
 
-        // Feedback detalhado para o terminal
-        $this->info("Sucesso! Resumo da limpeza:");
-        $this->line("- {$canceledCount} agendamentos pendentes foram cancelados.");
-        $this->line("- {$completedCount} agendamentos confirmados foram finalizados.");
-        $this->line("- {$affectedSlots} horários expirados foram desativados.");
+        // Feedback in the control panel/logs
+        $this->info("Cleanup completed successfully!");
+        $this->line("- {$canceled} pending appointments were expired/canceled.");
+        $this->line("- {$realized} confirmed appointments were marked as completed.");
+        $this->line("- {$disabledSlots} empty slots were disabled.");
     }
 }

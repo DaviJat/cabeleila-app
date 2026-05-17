@@ -11,7 +11,8 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('client_id')->constrained()->onDelete('cascade');
             $table->foreignId('availability_id')->constrained()->onDelete('cascade');
-            $table->string('status')->default('pending'); // pending, confirmed, canceled, completed
+            $table->enum('status', ['pending', 'confirmed', 'canceled', 'completed'])
+                ->default('pending');
             $table->text('notes')->nullable();
             $table->timestamps();
         });

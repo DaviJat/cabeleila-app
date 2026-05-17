@@ -17,7 +17,6 @@ const openDialog = (availability = null) => {
     displayDialog.value = true;
 };
 
-// Recebendo Clients e Services da Controller
 const props = defineProps({
     availabilities: { type: Array, required: true },
     clients: { type: Array, required: true },
@@ -78,12 +77,12 @@ const dailySlots = computed(() => {
                     </div>
                 </div>
             </template>
-
             <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 p-4 md:p-6 border rounded-lg">
+                <!-- Date Picker -->
                 <div class="flex-none flex justify-center w-full lg:w-auto">
                     <DatePicker v-model="selectedDate" inline class="border-none shadow-sm w-full sm:w-auto" />
                 </div>
-
+                <!-- Schedule Slots -->
                 <div class="flex-1 w-full">
                     <div class="pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div class="flex flex-col items-start">
@@ -92,23 +91,21 @@ const dailySlots = computed(() => {
                         </div>
                         <Button label="Adicionar Horário" icon="pi pi-plus" class="w-full sm:w-auto" @click="openDialog()" :disabled="isPastDate" />
                     </div>
-
+                    <!-- No Slots Message -->
                     <div
                         v-if="dailySlots.length === 0"
                         class="text-gray-500 flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-2 p-4 bg-gray-50 rounded-md border border-dashed text-center sm:text-left">
                         <i class="pi pi-calendar-times text-2xl sm:text-xl mb-1 sm:mb-0"></i>
                         <span>Nenhum horário cadastrado para este dia.</span>
                     </div>
-
+                    <!-- Daily Slots -->
                     <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                        <!-- CLIQUE GLOBAL DE VOLTA NO CARD -->
                         <div
                             v-for="slot in dailySlots"
                             :key="slot.id"
                             @click="openDialog(slot)"
                             class="relative border rounded-lg p-4 flex flex-col items-center justify-center gap-3 transition-colors h-full min-h-[140px] cursor-pointer"
-                            :class="slot.is_available ? 'bg-white hover:border-primary-400' : 'bg-gray-50 border-gray-200 opacity-90'">
-                            <!-- Botão Excluir (Com .stop para não abrir o modal ao tentar excluir) -->
+                            :class="slot.status.is_blocked ? 'bg-gray-50 border-gray-200 opacity-90' : 'bg-white hover:border-primary-400'">
                             <Button
                                 v-if="slot.is_available"
                                 icon="pi pi-times"
@@ -119,20 +116,17 @@ const dailySlots = computed(() => {
                                 v-tooltip.top="'Excluir Horário'"
                                 class="!absolute top-2 right-2 !w-8 !h-8 !p-0 text-gray-400 hover:text-red-500"
                                 @click.stop="deleteAvailability(slot.id)" />
-
-                            <!-- Centro do Card -->
                             <div class="flex flex-col items-center justify-center w-full mt-2">
                                 <span class="text-3xl font-bold text-gray-700">
                                     {{ formatTime(slot.hour) }}
                                 </span>
-                                <Tag v-if="slot.status_badge" :severity="slot.status_badge.severity" :value="slot.status_badge.label" rounded class="mt-2" />
+                                <Tag v-if="slot.status" :severity="slot.status.severity" :value="slot.status.label" rounded class="mt-2" />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </Panel>
-        <!-- Passando os clientes e serviços para o Dialog -->
         <SlotManagerDialog
             :visible="displayDialog"
             :date="selectedDate"
