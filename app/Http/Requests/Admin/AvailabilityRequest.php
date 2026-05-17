@@ -9,7 +9,7 @@ use Carbon\Carbon;
 class AvailabilityRequest extends FormRequest
 {
     /**
-     * Determina se o usuário está autorizado a fazer essa requisição.
+     * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
@@ -17,31 +17,26 @@ class AvailabilityRequest extends FormRequest
     }
 
     /**
-     * Regras de validação.
+     * Get the validation rules that apply to the request.
      */
     public function rules(): array
     {
-        // Captura o ID garantindo valor numérico para evitar erro de sintaxe no Postgres
-        $id = is_numeric($this->id) ? $this->id : null;
-
         return [
-            // O ID é necessário apenas para validar a existência no update
             'id' => 'nullable|numeric|exists:availabilities,id',
             'date' => 'required|date',
             'hour' => [
                 'required',
-                'regex:/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', // Valida formato HH:mm
-                // Valida se a combinação data + hora já existe, ignorando o próprio ID em caso de edição
-                Rule::unique('availabilities')->where(function ($query) {
-                    return $query->where('date', $this->date)
-                        ->where('hour', $this->hour);
-                })->ignore($id),
-                // Valida se o momento selecionado (data e hora) já passou
+                'regex:/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', // Validates HH:mm format
+                // Ensures the date + hour combination is unique, ignoring current ID on update
+                Rule::unique('availabilities')
+                    ->where(fn($query) => $query->where('date', $this->date)->where('hour', $this->hour))
+                    ->ignore($this->id),
+                // Validates that the chosen date and time has not already passed
                 function ($attribute, $value, $fail) {
                     if ($this->date && $value) {
-                        // Limpa a data de horas residuais e valida o momento completo contra o agora
-                        $cleanDate = Carbon::parse($this->date)->toDateString();
-                        if (Carbon::parse($cleanDate . ' ' . $value)->isPast()) {
+                        $targetDateTime = Carbon::parse(Carbon::parse($this->date)->toDateString() . ' ' . $value);
+                        // If the target date and time is in the past, validation fails
+                        if ($targetDateTime->isPast()) {
                             $fail('Não é possível cadastrar horários em datas ou horas passadas.');
                         }
                     }
@@ -51,7 +46,7 @@ class AvailabilityRequest extends FormRequest
     }
 
     /**
-     * Mensagens de erro personalizadas.
+     * Get the error messages for the defined validation rules.
      */
     public function messages(): array
     {
