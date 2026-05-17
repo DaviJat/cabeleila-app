@@ -95,10 +95,13 @@ const submitTime = () => {
                     {{ isEditing ? 'Gerenciar Horário' : 'Adicionar Horário' }}
                 </h3>
                 <p class="text-sm text-gray-500">
-                    <span v-if="isBlocked">Visualizando informações do horário</span>
-                    <span v-else>{{ isEditing ? 'Edite a hora deste slot' : 'Complete o campo para adicionar um novo horário' }}</span>
-                    para <strong>{{ date?.toLocaleDateString('pt-BR') }}</strong
-                    >.
+                    <span v-if="availability?.status.is_blocked"
+                        >Visualizando informações do horário <strong>({{ date?.toLocaleDateString('pt-BR') }})</strong>.</span
+                    >
+                    <span v-else
+                        >{{ isEditing ? 'Edite o campo para atualizar o horário' : 'Complete o campo para adicionar um novo horário' }}
+                        <strong>({{ date?.toLocaleDateString('pt-BR') }})</strong>.</span
+                    >
                 </p>
             </div>
         </template>
@@ -125,7 +128,7 @@ const submitTime = () => {
                     </div>
                     <Button
                         v-if="!availability?.status.is_blocked"
-                        :label="isEditing ? 'Atualizar' : 'Cadastrar'"
+                        :label="isEditing ? 'Atualizar' : 'Adicionar'"
                         icon="pi pi-check"
                         type="submit"
                         :loading="form.processing"

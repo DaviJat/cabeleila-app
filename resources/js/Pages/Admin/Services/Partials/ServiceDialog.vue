@@ -140,7 +140,7 @@ const submit = () => {
             <!-- Cancel Button -->
             <Button label="Cancelar" class="p-button-text" @click="closeDialog()" />
             <!-- Dynamic Submit Button -->
-            <Button :label="isEditing ? 'Atualizar' : 'Cadastrar'" iconPos="right" type="submit" form="form-servico" :loading="form.processing" />
+            <Button :label="isEditing ? 'Atualizar' : 'Adicionar'" iconPos="right" type="submit" form="form-servico" :loading="form.processing" />
         </template>
     </Dialog>
 </template>
