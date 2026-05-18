@@ -80,13 +80,13 @@ const submit = () => {
                 <h3 class="text-xl font-bold leading-tight text-gray-600">
                     {{ isEditing ? 'Editar Serviço' : 'Adicionar Serviço' }}
                 </h3>
-                <p class="text-sm text-gray-500">
+                <p class="text-xs text-gray-500">
                     {{ isEditing ? 'Altere os dados do serviço selecionado.' : 'Complete os campos para adicionar um novo serviço.' }}
                 </p>
             </div>
         </template>
         <!-- Dialog Content -->
-        <form id="form-servico" @submit.prevent="submit" class="space-y-4 pt-2">
+        <form id="service-form" @submit.prevent="submit" class="space-y-4 pt-2">
             <!-- Name -->
             <div class="flex flex-col gap-1">
                 <label for="name" class="font-semibold">Nome</label>
@@ -140,7 +140,7 @@ const submit = () => {
             <!-- Cancel Button -->
             <Button label="Cancelar" class="p-button-text" @click="closeDialog()" />
             <!-- Dynamic Submit Button -->
-            <Button :label="isEditing ? 'Atualizar' : 'Adicionar'" iconPos="right" type="submit" form="form-servico" :loading="form.processing" />
+            <Button :label="isEditing ? 'Atualizar' : 'Adicionar'" iconPos="right" type="submit" form="service-form" :loading="form.processing" />
         </template>
     </Dialog>
 </template>

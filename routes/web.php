@@ -16,7 +16,6 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/painel', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/agendamentos', [AppointmentController::class, 'index'])->name('appointments');
     Route::get('/clientes', [ClientController::class, 'index'])->name('clients');
 
 
@@ -27,6 +26,7 @@ Route::middleware('auth')->group(function () {
 
     // Rota para exibir a agenda
     Route::get('/agenda', [ScheduleController::class, 'index'])->name('schedule.index');
+    Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
 
     // Rotas para gerenciamento de horários
     Route::post('/horarios', [AvailabilityController::class, 'store'])->name('availabilities.store');

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AvailabilityRequest;
 use App\Models\Availability;
-use Inertia\Inertia;
 
 class AvailabilityController extends Controller
 {

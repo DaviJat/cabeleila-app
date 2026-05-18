@@ -12,7 +12,7 @@ class ScheduleController extends Controller
 {
     public function index()
     {
-        $availabilities = Availability::with('appointments')
+        $availabilities = Availability::with(['appointments.services', 'appointments.client'])
             ->orderBy('date')
             ->orderBy('hour', 'asc')
             ->get();

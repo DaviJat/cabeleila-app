@@ -6,11 +6,12 @@ import { Dialog, Button, DatePicker } from 'primevue';
 import AppointmentForm from '@/Pages/Admin/Schedule/Partials/AppointmentForm.vue';
 import AppointmentHistory from '@/Pages/Admin/Schedule/Partials/AppointmentHistory.vue';
 
-// Props received from the parent component
 const props = defineProps({
     visible: Boolean,
     availability: Object,
     date: Date,
+    clients: Array,
+    services: Array,
 });
 
 const toast = useToast();
@@ -94,7 +95,7 @@ const submitTime = () => {
                 <h3 class="text-xl font-bold leading-tight text-gray-600">
                     {{ isEditing ? 'Gerenciar Horário' : 'Adicionar Horário' }}
                 </h3>
-                <p class="text-sm text-gray-500">
+                <p class="text-xs text-gray-500">
                     <span v-if="availability?.status.is_blocked"
                         >Visualizando informações do horário <strong>({{ date?.toLocaleDateString('pt-BR') }})</strong>.</span
                     >
@@ -106,7 +107,7 @@ const submitTime = () => {
             </div>
         </template>
         <!-- Form for create/edit availability slots -->
-        <form id="form-horario" @submit.prevent="submitTime" class="space-y-4 pt-2">
+        <form id="availability-form" @submit.prevent="submitTime" class="space-y-4 pt-2">
             <div class="flex flex-col gap-1">
                 <label for="hour" class="font-semibold text-gray-700 text-sm">Hora do Atendimento</label>
                 <div class="flex gap-2 items-start">
