@@ -16,8 +16,6 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/painel', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/clientes', [ClientController::class, 'index'])->name('clients');
-
 
     // Rotas para gerenciamento de serviços
     Route::get('/servicos', [ServiceController::class, 'index'])->name('services.index');
@@ -32,9 +30,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/horarios', [AvailabilityController::class, 'store'])->name('availabilities.store');
     Route::delete('/horarios/{id}', [AvailabilityController::class, 'destroy'])->name('availabilities.destroy');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/clientes', [ClientController::class, 'index'])->name('clients');
+
+    Route::get('/perfil', [ProfileController::class, 'edit'])->name('perfil.edit');
+    Route::patch('/perfil', [ProfileController::class, 'update'])->name('perfil.update');
+    Route::delete('/perfil', [ProfileController::class, 'destroy'])->name('perfil.destroy');
 });
 
 require __DIR__ . '/auth.php';

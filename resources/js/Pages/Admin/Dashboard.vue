@@ -15,7 +15,7 @@ const props = defineProps({
 
 const isLoaded = ref(false);
 
-/** * Converte string de data ISO (YYYY-MM-DD) para objeto Date sem offset de fuso horário.
+/** * Converts ISO date string (YYYY-MM-DD) to Date object without timezone offset.
  */
 const parseDate = (dateString) => {
     if (!dateString) return null;
@@ -24,7 +24,7 @@ const parseDate = (dateString) => {
 
 const dateRange = ref([parseDate(props.filters?.start_date), parseDate(props.filters?.end_date)]);
 
-/** * Sincroniza o estado local do DatePicker com as propriedades enviadas pelo backend.
+/** * Syncs the local DatePicker state with the properties sent by the backend.
  */
 watch(
     () => props.filters,
@@ -36,13 +36,13 @@ watch(
     { deep: true },
 );
 
-/** * Formata valores numéricos para o padrão monetário brasileiro (BRL).
+/** * Formats numeric values to the Brazilian monetary standard (BRL).
  */
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
 };
 
-/** * Converte objeto Date nativo para o formato de persistência do banco (YYYY-MM-DD).
+/** * Converts native Date object to the database persistence format (YYYY-MM-DD).
  */
 const formatDateToDB = (date) => {
     if (!date) return '';
@@ -52,7 +52,7 @@ const formatDateToDB = (date) => {
     return `${d.getFullYear()}-${month}-${day}`;
 };
 
-/** * Submete os filtros de data aplicados via Inertia, preservando o estado e o scroll atual da página.
+/** * Submits applied date filters via Inertia, preserving state and scroll.
  */
 const applyFilter = (start, end) => {
     if (!start || !end) return;
@@ -71,7 +71,7 @@ const applyFilter = (start, end) => {
     );
 };
 
-/** Métodos auxiliares de seleção rápida de períodos. */
+/** Quick selection helper methods for standard periods. */
 const setToday = () => {
     const today = new Date();
     applyFilter(today, today);
@@ -98,7 +98,7 @@ const setYear = () => {
     applyFilter(firstDay, lastDay);
 };
 
-/** * Intercepta o evento de alteração manual do DatePicker para submissão imediata.
+/** * Intercepts manual change events from DatePicker for immediate submission.
  */
 const onDateSelect = (val) => {
     if (val && val[0] && val[1]) {
@@ -106,14 +106,14 @@ const onDateSelect = (val) => {
     }
 };
 
-/** Estados de configuração para o componente Chart.js. */
+/** Configuration states for Chart.js components. */
 const lineChartData = ref({});
 const lineChartOptions = ref({});
 const barChartData = ref({});
 const barChartOptions = ref({});
 
-/** * Estrutura a configuração de renderização dos gráficos, absorvendo dinamicamente as
- * variáveis de cor do preset global do PrimeVue.
+/** * Structures the rendering configuration of the charts, dynamically absorbing
+ * color variables from the global PrimeVue preset.
  */
 const setChartData = () => {
     if (!props.charts) return;
@@ -126,11 +126,11 @@ const setChartData = () => {
     const surfaceBorder = documentStyle.getPropertyValue('--p-surface-200').trim() || '#e8e8e6';
 
     lineChartData.value = {
-        labels: props.charts.receita.labels,
+        labels: props.charts.revenue.labels, // Updated key
         datasets: [
             {
                 label: 'Receita (R$)',
-                data: props.charts.receita.data,
+                data: props.charts.revenue.data, // Updated key
                 fill: true,
                 borderColor: brandColor,
                 backgroundColor: brandColorLight,
@@ -151,11 +151,11 @@ const setChartData = () => {
     };
 
     barChartData.value = {
-        labels: props.charts.servicos.labels,
+        labels: props.charts.services.labels,
         datasets: [
             {
-                label: 'Realizados',
-                data: props.charts.servicos.data,
+                label: 'Agendamentos', // <-- Mude de 'Realizados' para 'Agendamentos'
+                data: props.charts.services.data,
                 backgroundColor: brandColor,
                 borderRadius: 4,
             },
@@ -172,7 +172,7 @@ const setChartData = () => {
     };
 };
 
-/** * Monitora atualizações do objeto charts para re-renderização em tempo real.
+/** * Monitors updates to the charts object for real-time re-rendering.
  */
 watch(
     () => props.charts,
@@ -194,10 +194,8 @@ onMounted(() => {
     <Head title="Painel - Cabeleila" />
 
     <AuthenticatedLayout>
-        <div
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans transition-all duration-700 ease-out"
-            :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'">
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <div class="max-w-7xl font-sans transition-all duration-700 ease-out" :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
                     <p class="text-sm text-gray-500 mt-1" v-if="props.filters?.start_date">
@@ -205,7 +203,7 @@ onMounted(() => {
                         {{ props.filters.end_date.split('-').reverse().join('/') }}
                     </p>
                 </div>
-
+                <!-- Date Range Selector -->
                 <div class="flex flex-wrap items-center gap-2">
                     <Button
                         label="Hoje"
@@ -226,9 +224,8 @@ onMounted(() => {
                         class="!rounded-full !text-gray-600 !border-gray-300 hover:!bg-primary-50 hover:!text-primary-700"
                         @click="setMonth" />
                     <Button label="Ano" size="small" outlined class="!rounded-full !text-gray-600 !border-gray-300 hover:!bg-primary-50 hover:!text-primary-700" @click="setYear" />
-
                     <div class="w-px h-6 bg-gray-300 mx-2 hidden sm:block"></div>
-
+                    <!-- Date Picker -->
                     <DatePicker
                         v-model="dateRange"
                         selectionMode="range"
@@ -239,44 +236,45 @@ onMounted(() => {
                         @update:modelValue="onDateSelect" />
                 </div>
             </div>
-
+            <!-- KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <!-- Total Revenue -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                     <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Receita Total</h3>
-                    <p class="text-2xl font-bold text-primary-600">{{ formatCurrency(kpis?.receitaTotal) }}</p>
+                    <p class="text-2xl font-bold text-primary-600">{{ formatCurrency(kpis?.totalRevenue) }}</p>
                 </div>
-
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <!-- Total Appointments -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                     <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Agendamentos</h3>
-                    <p class="text-2xl font-bold text-blue-600">{{ kpis?.totalAgendamentos }}</p>
+                    <p class="text-2xl font-bold text-blue-600">{{ kpis?.totalAppointments }}</p>
                 </div>
-
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <!-- Completed Appointments -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                     <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Concluídos</h3>
-                    <p class="text-2xl font-bold text-green-600">{{ kpis?.concluidos }}</p>
+                    <p class="text-2xl font-bold text-green-600">{{ kpis?.completed }}</p>
                 </div>
-
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <!-- Confirmed Appointments -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                     <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Confirmados</h3>
-                    <p class="text-2xl font-bold text-teal-600">{{ kpis?.confirmados }}</p>
+                    <p class="text-2xl font-bold text-teal-600">{{ kpis?.confirmed }}</p>
                 </div>
-
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <!-- Pending Appointments -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                     <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Pendentes</h3>
-                    <p class="text-2xl font-bold text-orange-500">{{ kpis?.pendentes }}</p>
+                    <p class="text-2xl font-bold text-orange-500">{{ kpis?.pending }}</p>
                 </div>
             </div>
-
+            <!-- Charts Section -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                     <h3 class="text-lg font-bold text-gray-900 mb-6">Evolução de Receita</h3>
                     <div class="h-80 relative">
                         <Chart type="line" :data="lineChartData" :options="lineChartOptions" class="h-full w-full" />
                     </div>
                 </div>
-
+                <!-- Most Performed Services Chart -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 class="text-lg font-bold text-gray-900 mb-6">Serviços Mais Realizados</h3>
+                    <h3 class="text-lg font-bold text-gray-900 mb-6">Serviços Mais Agendados</h3>
                     <div class="h-80 relative">
                         <Chart type="bar" :data="barChartData" :options="barChartOptions" class="h-full w-full" />
                     </div>

@@ -4,101 +4,92 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
-use Carbon\Carbon;
-use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Carbon\Carbon;
+use Inertia\Response;
 
 class DashboardController extends Controller
 {
     /**
-     * Processa os dados do dashboard administrativo.
+     * Display the dashboard metrics and charts based on scheduled dates.
      */
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
-        // Define o período de análise com base nos filtros fornecidos ou usa o mês atual como padrão.
-        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
-        $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->format('Y-m-d'));
+        // Define default dates if no filter is applied (current month)
+        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
+        $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
-        // Consulta os agendamentos dentro do período selecionado, incluindo as relações necessárias.
-        $appointments = Appointment::with(['availability', 'services'])
-            ->whereHas('availability', function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('date', [$startDate, $endDate]);
-            })->get();
+        // Base query: Joining availabilities to filter by the ACTUAL SCHEDULED DATE, not created_at
+        $baseQuery = Appointment::query()
+            ->join('availabilities', 'appointments.availability_id', '=', 'availabilities.id')
+            ->whereBetween('availabilities.date', [$startDate, $endDate]);
 
-        // Cálculo dos KPIs principais.
-        $totalAgendamentos = $appointments->count();
-        $pendentes = $appointments->where('status', 'pending')->count();
-        $confirmados = $appointments->where('status', 'confirmed')->count();
-        $concluidos = $appointments->where('status', 'completed')->count();
+        // 1. Calculate General KPIs (Explicitly using appointments.status to avoid ambiguity)
+        $totalAppointments = (clone $baseQuery)->whereIn('appointments.status', ['pending', 'confirmed', 'completed'])->count();
+        $pending = (clone $baseQuery)->where('appointments.status', 'pending')->count();
+        $confirmed = (clone $baseQuery)->where('appointments.status', 'confirmed')->count();
+        $completed = (clone $baseQuery)->where('appointments.status', 'completed')->count();
 
-        // Determina se a análise será mensal ou diária com base na diferença entre as datas.
-        $diffDays = Carbon::parse($startDate)->diffInDays(Carbon::parse($endDate));
-        $isMonthly = $diffDays > 60;
+        // Calculate Total Revenue joining services and availabilities
+        $totalRevenue = DB::table('appointments')
+            ->join('availabilities', 'appointments.availability_id', '=', 'availabilities.id')
+            ->join('appointment_service', 'appointments.id', '=', 'appointment_service.appointment_id')
+            ->join('services', 'appointment_service.service_id', '=', 'services.id')
+            ->whereIn('appointments.status', ['confirmed', 'completed'])
+            ->whereBetween('availabilities.date', [$startDate, $endDate])
+            ->sum('services.price');
 
-        $receitaPorPeriodo = [];
+        // 2. Calculate Chart Data: Top 5 Services performed
+        $topServices = DB::table('appointment_service')
+            ->join('appointments', 'appointment_service.appointment_id', '=', 'appointments.id')
+            ->join('availabilities', 'appointments.availability_id', '=', 'availabilities.id')
+            ->join('services', 'appointment_service.service_id', '=', 'services.id')
+            ->whereIn('appointments.status', ['pending', 'confirmed', 'completed']) // <-- Adicionado o 'pending' aqui!
+            ->whereBetween('availabilities.date', [$startDate, $endDate])
+            ->select('services.name', DB::raw('count(*) as total'))
+            ->groupBy('services.id', 'services.name')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
 
-        if ($isMonthly) {
-            $period = CarbonPeriod::create(Carbon::parse($startDate)->startOfMonth(), '1 month', Carbon::parse($endDate)->startOfMonth());
-            foreach ($period as $date) {
-                $receitaPorPeriodo[$date->format('m/Y')] = 0;
-            }
-        } else {
-            $period = CarbonPeriod::create($startDate, $endDate);
-            foreach ($period as $date) {
-                $receitaPorPeriodo[$date->format('d/m')] = 0;
-            }
-        }
+        // 3. Calculate Chart Data: Revenue over time (Grouped by Scheduled Date)
+        $revenueOverTime = DB::table('appointments')
+            ->join('availabilities', 'appointments.availability_id', '=', 'availabilities.id')
+            ->join('appointment_service', 'appointments.id', '=', 'appointment_service.appointment_id')
+            ->join('services', 'appointment_service.service_id', '=', 'services.id')
+            ->whereIn('appointments.status', ['confirmed', 'completed'])
+            ->whereBetween('availabilities.date', [$startDate, $endDate])
+            ->select('availabilities.date', DB::raw('SUM(services.price) as daily_revenue'))
+            ->groupBy('availabilities.date')
+            ->orderBy('availabilities.date')
+            ->get();
 
-        $receitaTotal = 0;
-        $servicosCount = collect();
-
-        // Processamento dos dados de receita e contagem de serviços realizados.
-        foreach ($appointments as $app) {
-            if (in_array($app->status, ['confirmed', 'completed'])) {
-                if ($app->availability) {
-                    $date = Carbon::parse($app->availability->date);
-
-                    $key = $isMonthly ? $date->format('m/Y') : $date->format('d/m');
-
-                    if (array_key_exists($key, $receitaPorPeriodo)) {
-                        $price = $app->total_price;
-                        $receitaPorPeriodo[$key] += $price;
-                        $receitaTotal += $price;
-                    }
-                }
-            }
-
-            foreach ($app->services as $service) {
-                $servicosCount->push($service->name);
-            }
-        }
-
-        // Identificação dos serviços mais populares.
-        $topServicos = $servicosCount->countBy()->sortDesc()->take(5);
-
+        // Return Inertia Response with formatted payload
         return Inertia::render('Admin/Dashboard', [
             'filters' => [
                 'start_date' => $startDate,
                 'end_date' => $endDate,
             ],
             'kpis' => [
-                'receitaTotal' => $receitaTotal,
-                'totalAgendamentos' => $totalAgendamentos,
-                'concluidos' => $concluidos,
-                'confirmados' => $confirmados,
-                'pendentes' => $pendentes,
+                'totalRevenue' => (float) $totalRevenue,
+                'totalAppointments' => $totalAppointments,
+                'completed' => $completed,
+                'confirmed' => $confirmed,
+                'pending' => $pending,
             ],
             'charts' => [
-                'receita' => [
-                    'labels' => array_keys($receitaPorPeriodo),
-                    'data' => array_values($receitaPorPeriodo),
+                'revenue' => [
+                    // Format dates to DD/MM for better chart display using the new availabilities.date
+                    'labels' => $revenueOverTime->pluck('date')->map(fn($date) => Carbon::parse($date)->format('d/m'))->toArray(),
+                    'data' => $revenueOverTime->pluck('daily_revenue')->toArray(),
                 ],
-                'servicos' => [
-                    'labels' => $topServicos->keys()->toArray(),
-                    'data' => $topServicos->values()->toArray(),
-                ]
-            ]
+                'services' => [
+                    'labels' => $topServices->pluck('name')->toArray(),
+                    'data' => $topServices->pluck('total')->toArray(),
+                ],
+            ],
         ]);
     }
 }

@@ -12,7 +12,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.patch(route('profile.update'), {
+    form.patch(route('perfil.update'), {
         preserveScroll: true,
         onSuccess: () => {
             toast.add({
