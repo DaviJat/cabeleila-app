@@ -21,19 +21,26 @@ class AppointmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id' => 'required|integer|exists:clients,id',
-            'service_ids' => 'required|array|min:1',
+            // If an ID is provided, it's an update process
+            'id' => 'nullable|integer|exists:appointments,id',
+            'status' => 'nullable|string|in:pending,confirmed,canceled',
+
+            // Creation fields are only required when NO ID is supplied
+            'client_id' => 'required_without:id|integer|exists:clients,id',
+            'service_ids' => 'required_without:id|array|min:1',
             'service_ids.*' => 'integer|exists:services,id',
             'notes' => 'nullable|string|max:1000',
             'availability_id' => [
-                'required',
+                'required_without:id',
                 'integer',
                 'exists:availabilities,id',
-                // Custom rule to ensure the slot is actually free
+                // Custom rule to prevent double-booking ONLY during creation phase
                 function ($attribute, $value, $fail) {
-                    $availability = Availability::find($value);
-                    if ($availability && !$availability->is_available) {
-                        $fail('Este horário já foi ocupado por outro agendamento.');
+                    if (!$this->filled('id')) {
+                        $availability = Availability::find($value);
+                        if ($availability && !$availability->is_available) {
+                            $fail('Este horário já foi ocupado por outro agendamento.');
+                        }
                     }
                 },
             ],
@@ -46,13 +53,13 @@ class AppointmentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'client_id.required' => 'O cliente é obrigatório.',
+            'client_id.required_without' => 'O cliente é obrigatório.',
             'client_id.exists' => 'O cliente selecionado não é válido.',
-            'service_ids.required' => 'Selecione ao menos um serviço.',
+            'service_ids.required_without' => 'Selecione ao menos um serviço.',
             'service_ids.array' => 'O formato dos serviços é inválido.',
             'service_ids.min' => 'Selecione ao menos um serviço.',
             'service_ids.*.exists' => 'Um dos serviços selecionados não é válido.',
-            'availability_id.required' => 'O horário é obrigatório.',
+            'availability_id.required_without' => 'O horário é obrigatório.',
             'availability_id.exists' => 'O horário selecionado não existe.',
         ];
     }

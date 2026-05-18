@@ -12,35 +12,52 @@ use Illuminate\Http\RedirectResponse;
 
 class AppointmentController extends Controller
 {
-    // Store a new appointment, attach services, and mark the availability slot as occupied
+    // Store a newly created appointment or update status of an existing one.
     public function store(AppointmentRequest $request): RedirectResponse
     {
         try {
-            // Use a database transaction to ensure data integrity
+            // Use a database transaction to protect multi-table operational integrity
             DB::transaction(function () use ($request) {
 
-                // 1. Create the new appointment (without the service_id column)
-                $appointment = Appointment::create([
-                    'availability_id' => $request->availability_id,
-                    'client_id'       => $request->client_id,
-                    'notes'           => $request->notes,
-                    'status'          => 'confirmed',
-                ]);
+                // Check if we're updating an existing appointment or creating a new one
+                if ($request->filled('id')) {
+                    // A: Update the status of an existing appointment
+                    $appointment = Appointment::findOrFail($request->id);
 
-                // 2. Attach the multiple services to the pivot table
-                $appointment->services()->attach($request->service_ids);
+                    $appointment->update([
+                        'status' => $request->status
+                    ]);
 
-                // 3. Mark the availability slot as occupied
-                $availability = Availability::find($request->availability_id);
-                $availability->update([
-                    'is_available' => false
-                ]);
+                    // Free up the availability slot immediately if the appointment gets canceled
+                    if ($request->status === 'canceled') {
+                        $appointment->availability()->update([
+                            'is_available' => true
+                        ]);
+                    }
+                } else {
+                    // B: Create a new appointment with the provided availability, client, and notes
+                    $appointment = Appointment::create([
+                        'availability_id' => $request->availability_id,
+                        'client_id'       => $request->client_id,
+                        'notes'           => $request->notes,
+                        'status'          => 'confirmed', // Manually added bookings start as confirmed
+                    ]);
+
+                    // Attach chosen services array to the pivot table
+                    $appointment->services()->attach($request->service_ids);
+
+                    // Block the availability slot from being re-selected
+                    $availability = Availability::find($request->availability_id);
+                    $availability->update([
+                        'is_available' => false
+                    ]);
+                }
             });
 
-            return redirect()->back()->with('success', 'Agendamento realizado com sucesso!');
+            return redirect()->back();
         } catch (\Exception $e) {
             Log::error($e->getMessage());
-            return redirect()->back()->with('error', 'Ocorreu um erro ao processar o agendamento. Tente novamente.');
+            return redirect()->back()->with('error', 'Ocorreu um erro ao processar a requisição.');
         }
     }
 }

@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { useForm, router } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { Select, Button, Textarea, MultiSelect, Tag } from 'primevue';
 import { formatCurrency } from '@/Utils/formatters';
@@ -40,6 +40,25 @@ const submitAppointment = () => {
             toast.add({ severity: 'success', summary: 'Sucesso!', detail: 'Agendamento realizado com sucesso!', life: 3000 });
         },
     });
+};
+
+// Handles status changes (confirm or cancel) for an existing appointment
+const changeAppointmentStatus = (appointmentId, newStatus) => {
+    router.post(
+        route('appointments.store'),
+        {
+            id: appointmentId,
+            status: newStatus,
+        },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                const actionLabel = newStatus === 'confirmed' ? 'confirmado' : 'cancelado';
+                toast.add({ severity: 'success', summary: 'Atualizado', detail: `Agendamento ${actionLabel} com sucesso!`, life: 3000 });
+                emit('close'); // Opcional: fecha o modal automaticamente após a ação
+            },
+        },
+    );
 };
 </script>
 
@@ -131,6 +150,15 @@ const submitAppointment = () => {
                 <p class="font-semibold text-gray-800 mb-1">Observações:</p>
                 <p class="text-gray-600 bg-white p-2 rounded border border-gray-100">{{ activeAppointment.notes }}</p>
             </div>
+        </div>
+        <div class="flex flex-col gap-2 pt-2 w-full">
+            <Button
+                v-if="activeAppointment.status === 'pending'"
+                label="Confirmar Reserva"
+                icon="pi pi-check"
+                class="w-full"
+                @click="changeAppointmentStatus(activeAppointment.id, 'confirmed')" />
+            <Button label="Cancelar Reserva" icon="pi pi-times" severity="danger" outlined class="w-full" @click="changeAppointmentStatus(activeAppointment.id, 'canceled')" />
         </div>
     </div>
 </template>
