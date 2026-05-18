@@ -82,7 +82,7 @@ const dailySlots = computed(() => {
                     </div>
                 </div>
             </template>
-            <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 p-4 md:p-6 border rounded-lg">
+            <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 sm:p-4 md:p-6 sm:border rounded-lg">
                 <!-- Date Picker -->
                 <div class="flex-none flex justify-center w-full lg:w-auto">
                     <DatePicker v-model="selectedDate" inline class="border-none shadow-sm w-full sm:w-auto" />
