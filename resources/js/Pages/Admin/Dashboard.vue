@@ -197,7 +197,7 @@ onMounted(() => {
         <div class="max-w-7xl font-sans transition-all duration-700 ease-out" :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'">
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+                    <h1 class="text-2xl font-bold text-gray-700">Dashboard</h1>
                     <p class="text-sm text-gray-500 mt-1" v-if="props.filters?.start_date">
                         {{ props.filters.start_date.split('-').reverse().join('/') }} a
                         {{ props.filters.end_date.split('-').reverse().join('/') }}
@@ -267,14 +267,14 @@ onMounted(() => {
             <!-- Charts Section -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                    <h3 class="text-lg font-bold text-gray-900 mb-6">Evolução de Receita</h3>
+                    <h3 class="text-lg font-bold text-gray-700 mb-6">Evolução de Receita</h3>
                     <div class="h-80 relative">
                         <Chart type="line" :data="lineChartData" :options="lineChartOptions" class="h-full w-full" />
                     </div>
                 </div>
                 <!-- Most Performed Services Chart -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 class="text-lg font-bold text-gray-900 mb-6">Serviços Mais Agendados</h3>
+                    <h3 class="text-lg font-bold text-gray-700 mb-6">Serviços Mais Agendados</h3>
                     <div class="h-80 relative">
                         <Chart type="bar" :data="barChartData" :options="barChartOptions" class="h-full w-full" />
                     </div>
