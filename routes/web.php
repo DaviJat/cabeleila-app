@@ -15,6 +15,7 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->group(function () {
+    // Rota para o dashboard
     Route::get('/painel', [DashboardController::class, 'index'])->name('dashboard');
 
     // Rotas para gerenciamento de serviços
@@ -30,8 +31,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/horarios', [AvailabilityController::class, 'store'])->name('availabilities.store');
     Route::delete('/horarios/{id}', [AvailabilityController::class, 'destroy'])->name('availabilities.destroy');
 
-    Route::get('/clientes', [ClientController::class, 'index'])->name('clients');
+    // Rotas para gerenciamento de clientes
+    Route::get('/clientes', [ClientController::class, 'index'])->name('clients.index');
+    Route::post('/clientes', [ClientController::class, 'store'])->name('clients.store');
+    Route::delete('/clientes/{id}', [ClientController::class, 'destroy'])->name('clients.destroy');
 
+    // Rotas para gerenciamento de perfil do usuário
     Route::get('/perfil', [ProfileController::class, 'edit'])->name('perfil.edit');
     Route::patch('/perfil', [ProfileController::class, 'update'])->name('perfil.update');
     Route::delete('/perfil', [ProfileController::class, 'destroy'])->name('perfil.destroy');

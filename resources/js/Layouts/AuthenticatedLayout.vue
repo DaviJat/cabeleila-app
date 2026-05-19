@@ -24,7 +24,7 @@ onUnmounted(() => {
 const items = [
     { label: 'Painel', route: 'dashboard' },
     { label: 'Agenda', route: 'schedule.index' },
-    { label: 'Clientes', route: 'clients' },
+    { label: 'Clientes', route: 'clients.index' },
     { label: 'Serviços', route: 'services.index' },
 
     // --- Opções exclusivas do mobile (md:hidden) ---
