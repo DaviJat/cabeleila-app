@@ -21,14 +21,14 @@ class ProfileUpdateRequest extends FormRequest
                 'lowercase',
                 'email',
                 'max:255',
-                // Garante que o e-mail seja único, exceto para o próprio dono do perfil
+                // Ensure the email is unique, but ignore the current user's email
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
         ];
     }
 
     /**
-     * Mensagens personalizadas para o Toast/Frontend
+     * Custom messages for validation errors.
      */
     public function messages(): array
     {

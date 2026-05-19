@@ -29,7 +29,7 @@ const updatePassword = () => {
         onError: () => {
             if (form.errors.password) {
                 form.reset('password', 'password_confirmation');
-                // Ajuste para focar no input interno do componente Password
+                // Focus the new password field if there are errors related to it
                 passwordInput.value?.$el.querySelector('input')?.focus();
             }
             if (form.errors.current_password) {
@@ -47,10 +47,10 @@ const updatePassword = () => {
             <h2 class="text-lg font-medium text-gray-900">Atualizar Senha</h2>
             <p class="mt-1 text-sm text-gray-600">Certifique-se de que sua conta esteja usando uma senha segura.</p>
         </header>
-        <!-- Formulário de Atualização de Senha -->
+        <!-- Update Password Form -->
         <form @submit.prevent="updatePassword" class="mt-6 space-y-6">
             <input type="text" name="username" :value="$page.props.auth.user.email" class="hidden" autocomplete="username" />
-            <!-- Senha Atual -->
+            <!-- Current Password -->
             <div class="flex flex-col gap-1">
                 <label for="current_password" class="font-semibold text-gray-700">Senha Atual</label>
                 <Password
@@ -67,7 +67,7 @@ const updatePassword = () => {
                     @update:modelValue="form.clearErrors('current_password')" />
                 <small v-if="form.errors.current_password" class="text-red-500">{{ form.errors.current_password }}</small>
             </div>
-            <!-- Nova Senha -->
+            <!-- New Password -->
             <div class="flex flex-col gap-1">
                 <label for="password" class="font-semibold text-gray-700">Nova Senha</label>
                 <Password
@@ -88,7 +88,7 @@ const updatePassword = () => {
                 </Password>
                 <small v-if="form.errors.password" class="text-red-500">{{ form.errors.password }}</small>
             </div>
-            <!-- Confirmar Senha -->
+            <!-- Confirm New Password -->
             <div class="flex flex-col gap-1">
                 <label for="password_confirmation" class="font-semibold text-gray-700">Confirmar Senha</label>
                 <Password
@@ -104,7 +104,7 @@ const updatePassword = () => {
                     @update:modelValue="form.clearErrors('password_confirmation')" />
                 <small v-if="form.errors.password_confirmation" class="text-red-500">{{ form.errors.password_confirmation }}</small>
             </div>
-            <!-- Botão de Salvar -->
+            <!-- Submit Button -->
             <div class="flex items-center gap-4 mt-6">
                 <Button label="Salvar Senha" type="submit" :loading="form.processing" />
             </div>

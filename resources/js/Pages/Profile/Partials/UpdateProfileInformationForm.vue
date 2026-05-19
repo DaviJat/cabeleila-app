@@ -32,9 +32,9 @@ const submit = () => {
             <h2 class="text-lg font-medium text-gray-900">Informações do Perfil</h2>
             <p class="mt-1 text-sm text-gray-600">Atualize as informações do perfil e o endereço de e-mail da sua conta.</p>
         </header>
-        <!-- Formulário de atualização de informações do perfil -->
+        <!-- Update Profile Information Form -->
         <form @submit.prevent="submit" class="mt-6 space-y-6">
-            <!-- Nome -->
+            <!-- Name -->
             <div class="flex flex-col gap-2">
                 <label for="name" class="font-medium text-gray-700">Nome</label>
                 <InputText id="name" type="text" class="w-full" v-model="form.name" required autofocus autocomplete="name" placeholder="Seu nome completo" />
@@ -46,7 +46,7 @@ const submit = () => {
                 <InputText id="email" type="email" class="w-full" v-model="form.email" required autocomplete="username" placeholder="exemplo@email.com" />
                 <small v-if="form.errors.email" class="text-red-500">{{ form.errors.email }}</small>
             </div>
-            <!-- Botão de envio -->
+            <!-- Submit Button -->
             <div class="flex items-center gap-4 mt-6">
                 <Button label="Salvar" type="submit" :loading="form.processing" />
             </div>

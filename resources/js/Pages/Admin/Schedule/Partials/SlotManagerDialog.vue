@@ -89,7 +89,7 @@ const submitTime = () => {
 </script>
 
 <template>
-    <Dialog :visible="visible" @update:visible="closeDialog" modal class="mx-4 w-full max-w-md">
+    <Dialog :visible="visible" @update:visible="closeDialog" modal class="mx-4">
         <template #header>
             <div class="flex flex-col items-start mr-8">
                 <h3 class="text-xl font-bold leading-tight text-gray-600">

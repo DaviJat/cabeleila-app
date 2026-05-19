@@ -30,7 +30,7 @@ const items = [
     // --- Opções exclusivas do mobile (md:hidden) ---
     { separator: true, class: 'md:hidden' }, // Linha divisória
     { isProfileHeader: true, class: 'md:hidden' }, // Bloco de texto com nome e email
-    { label: 'Meu Perfil', route: 'perfil.edit', icon: 'pi pi-user', class: 'md:hidden' },
+    { label: 'Meu Perfil', route: 'profile.index', icon: 'pi pi-user', class: 'md:hidden' },
     { label: 'Sair', action: 'logout', icon: 'pi pi-sign-out', class: 'md:hidden' },
 ];
 

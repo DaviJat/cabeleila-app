@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-
+use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -16,9 +16,9 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function edit(): Response
+    public function index(): Response
     {
-        return Inertia::render('Profile/Edit');
+        return Inertia::render('Profile/Index');
     }
 
     /**
@@ -30,7 +30,7 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('perfil.edit');
+        return Redirect::route('profile.index');
     }
 
     /**

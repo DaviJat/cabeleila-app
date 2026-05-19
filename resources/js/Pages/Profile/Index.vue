@@ -4,7 +4,7 @@ import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
 import { Head } from '@inertiajs/vue3';
-import { Panel, Toast } from 'primevue';
+import { Panel } from 'primevue';
 </script>
 
 <template>
@@ -20,17 +20,17 @@ import { Panel, Toast } from 'primevue';
                 </div>
             </template>
             <div class="flex flex-col gap-8 p-2 sm:p-6">
-                <!-- Seção de atualização de informações do perfil -->
+                <!-- Section for updating profile information -->
                 <section class="max-w-xl">
                     <UpdateProfileInformationForm />
                 </section>
                 <hr class="border-gray-200" />
-                <!-- Seção de atualização de senha -->
+                <!-- Section for updating password -->
                 <section class="max-w-xl">
                     <UpdatePasswordForm />
                 </section>
                 <hr class="border-gray-200" />
-                <!-- Seção de exclusão de conta -->
+                <!-- Section for deleting account -->
                 <section class="max-w-xl">
                     <DeleteUserForm />
                 </section>

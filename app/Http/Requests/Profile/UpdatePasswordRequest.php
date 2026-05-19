@@ -7,15 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class UpdatePasswordRequest extends FormRequest
 {
     /**
-     * Determina se o usuário está autorizado a fazer esta requisição.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    /**
-     * Regras de validação.
+     * Get the validation rules that apply to the request.
      */
     public function rules(): array
     {
@@ -30,7 +22,7 @@ class UpdatePasswordRequest extends FormRequest
     }
 
     /**
-     * Mensagens de erro personalizadas.
+     * Custom messages for validation errors.
      */
     public function messages(): array
     {

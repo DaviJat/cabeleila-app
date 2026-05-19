@@ -87,7 +87,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Dialog :visible="visible" @update:visible="closeDialog" modal class="mx-4 w-full md:w-[600px] lg:w-[800px]">
+    <Dialog :visible="visible" @update:visible="closeDialog" modal class="mx-4">
         <!-- Dialog Header -->
         <template #header>
             <div class="flex flex-col items-start mr-8">

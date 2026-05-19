@@ -9,7 +9,6 @@ const form = useForm({
     remember: false,
 });
 
-// Estado para controlar o Dialog
 const showDialog = ref(false);
 
 const submit = () => {
@@ -18,7 +17,7 @@ const submit = () => {
     });
 };
 
-// Animação de entrada
+// Animation for page load
 const isLoaded = ref(false);
 onMounted(() => {
     setTimeout(() => {
@@ -68,7 +67,7 @@ onMounted(() => {
                             required />
                         <small v-if="form.errors.email" class="text-red-500">{{ form.errors.email }}</small>
                     </div>
-                    <!-- Senha -->
+                    <!-- Password -->
                     <div class="flex flex-col gap-1">
                         <label for="password" class="font-semibold text-sm">Senha</label>
                         <Password
@@ -84,27 +83,28 @@ onMounted(() => {
                             required />
                         <small v-if="form.errors.password" class="text-red-500">{{ form.errors.password }}</small>
                     </div>
-                    <!-- Lembrar-me e Esqueci minha senha -->
                     <div class="flex items-center justify-between mt-2">
+                        <!-- Remember me -->
                         <div class="flex items-center gap-2">
                             <Checkbox v-model="form.remember" inputId="remember" binary />
                             <label for="remember" class="text-sm font-medium text-gray-700 cursor-pointer">Lembrar-me</label>
                         </div>
+                        <!-- Forgot Password -->
                         <Button @click="showDialog = true" class="!p-0 hover:underline" variant="link">Esqueceu a senha?</Button>
                     </div>
-                    <!-- Botão de submit -->
+                    <!-- Submit Button -->
                     <Button type="submit" label="Entrar na Conta" class="w-full !rounded-full !py-3.5 !font-bold shadow-md mt-2" :loading="form.processing" />
                 </form>
             </div>
         </div>
-        <!-- Seção de imagem lateral para telas grandes -->
         <div
             class="hidden lg:block relative w-0 flex-1 bg-gray-900 transition-all duration-1000 delay-200 ease-out"
             :class="isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'">
+            <!-- Background image with gradient overlay -->
             <img class="absolute inset-0 h-full w-full object-cover opacity-90" src="/images/foto-salao-login.png" alt="Ambiente do salão" />
-
+            <!-- Image overlay for gradient effect -->
             <div class="absolute inset-0 bg-gradient-to-t from-[#547558]/80 via-transparent to-transparent"></div>
-
+            <!-- Quote -->
             <div class="absolute bottom-12 left-12 right-12 text-white">
                 <blockquote class="space-y-4">
                     <p class="text-2xl font-bold leading-tight">"O cuidado que você merece, a autoestima que você conquista."</p>
@@ -112,8 +112,8 @@ onMounted(() => {
                 </blockquote>
             </div>
         </div>
-        <!-- Dialog para recuperação de senha -->
-        <Dialog v-model:visible="showDialog" modal header="Recuperação de Acesso" :style="{ width: '25rem' }" class="font-sans">
+        <!-- Dialog for password recovery -->
+        <Dialog v-model:visible="showDialog" modal header="Recuperação de Acesso" class="mx-4">
             <div class="flex flex-col gap-4">
                 <p class="text-gray-600 text-justify leading-relaxed">Para redefinir sua senha, por favor entre em contato com o <strong>desenvolvedor do projeto</strong>.</p>
                 <div class="flex justify-end mt-2">

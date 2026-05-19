@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Client;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,18 +16,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Create Admin
-        User::factory()->create([
+        // Create a default admin user
+        User::create([
             'name' => 'Leila Admin',
             'email' => 'leila@example.com',
-            'role' => 'admin',
+            'password' => Hash::make('admin'),
         ]);
 
-        // 2. Create Clients
-        Client::factory(20)->create();
-
-        // 3. Call modular seeders in the correct order
+        // Seed clients, services, availabilities, and appointments
         $this->call([
+            ClientSeeder::class,         // Create clients first so appointments can reference them
             ServiceSeeder::class,        // Create services first so appointments can reference them
             AvailabilitySeeder::class,   // Create availabilities next to have slots for appointments
             AppointmentSeeder::class,    // Create appointments last since they depend on clients and availabilities
