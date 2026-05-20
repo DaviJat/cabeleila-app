@@ -26,14 +26,16 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Custom messages for validation errors.
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
      */
     public function messages(): array
     {
         return [
-            'email.required'    => 'O e-mail é obrigatório.',
-            'email.email'       => 'Digite um e-mail válido.',
-            'password.required' => 'A senha é obrigatória.',
+            'email.required'    => 'O campo email é obrigatório.',
+            'email.email'       => 'Por favor, insira um endereço de email válido.',
+            'password.required' => 'O campo senha é obrigatório.',
         ];
     }
 
@@ -50,7 +52,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => 'E-mail ou senha incorretos.',
+                'email' => 'Email ou senha inválidos.',
             ]);
         }
 

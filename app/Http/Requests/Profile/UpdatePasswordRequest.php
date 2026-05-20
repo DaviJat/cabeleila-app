@@ -8,6 +8,8 @@ class UpdatePasswordRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
     public function rules(): array
     {
@@ -22,7 +24,9 @@ class UpdatePasswordRequest extends FormRequest
     }
 
     /**
-     * Custom messages for validation errors.
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
      */
     public function messages(): array
     {
@@ -30,7 +34,7 @@ class UpdatePasswordRequest extends FormRequest
             'current_password.required' => 'A senha atual é obrigatória.',
             'current_password.current_password' => 'A senha atual está incorreta.',
             'password.required' => 'A nova senha é obrigatória.',
-            'password.confirmed' => 'A confirmação da nova senha não confere.',
+            'password.confirmed' => 'A confirmação da senha não corresponde.',
             'password.min' => 'A senha deve ter pelo menos 6 caracteres.',
         ];
     }

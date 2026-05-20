@@ -19,8 +19,9 @@ const props = defineProps({
     },
 });
 
+// If service is null, it will open the dialog in create mode; otherwise, it will be in edit mode
 const openDialog = (service = null) => {
-    selectedService.value = service; // If service is null, it will open the dialog in create mode; otherwise, it will be in edit mode
+    selectedService.value = service;
     displayDialog.value = true;
 };
 

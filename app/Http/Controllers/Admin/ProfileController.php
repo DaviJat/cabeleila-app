@@ -15,6 +15,8 @@ class ProfileController extends Controller
 {
     /**
      * Display the user's profile form.
+     *
+     * @return Response
      */
     public function index(): Response
     {
@@ -23,6 +25,9 @@ class ProfileController extends Controller
 
     /**
      * Update the user's profile information.
+     *
+     * @param ProfileUpdateRequest $request
+     * @return RedirectResponse
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
@@ -35,15 +40,20 @@ class ProfileController extends Controller
 
     /**
      * Delete the user's account.
+     *
+     * @param ProfileDestroyRequest $request
+     * @return RedirectResponse
      */
     public function destroy(ProfileDestroyRequest $request): RedirectResponse
     {
         $user = $request->user();
 
+        // Logout before deleting the account to prevent session-related errors
         Auth::logout();
 
         $user->delete();
 
+        // Invalidate the session and regenerate the CSRF token for security
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

@@ -6,10 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ServiceRequest;
 use App\Models\Service;
 use Inertia\Inertia;
+use Inertia\Response;
+use Illuminate\Http\RedirectResponse;
 
 class ServiceController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the services.
+     *
+     * @return Response
+     */
+    public function index(): Response
     {
         $services = Service::orderBy('id', 'desc')->get();
 
@@ -18,33 +25,40 @@ class ServiceController extends Controller
         ]);
     }
 
-    // Cria ou atualiza um serviço
-    public function store(ServiceRequest $request)
+    /**
+     * Store or update a service.
+     *
+     * @param ServiceRequest $request
+     * @return RedirectResponse
+     */
+    public function store(ServiceRequest $request): RedirectResponse
     {
-        // Valida os dados usando as regras definidas no SaveServiceRequest
         $validated = $request->validated();
-
         $id = $request->input('id');
 
-        // Remove o ID do array de validação para evitar problemas com o updateOrCreate
+        // We unset the ID to prevent it from being passed as a column value 
+        // to updateOrCreate, allowing it to act solely as the identifier.
         unset($validated['id']);
 
-        // Se o ID for fornecido, atualiza o serviço existente; caso contrário, cria um novo serviço
         Service::updateOrCreate(
             ['id' => $id],
             $validated
         );
 
-        $mensagem = $id ? 'Serviço atualizado com sucesso!' : 'Serviço cadastrado com sucesso!';
+        $message = $id ? 'Serviço atualizado com sucesso!' : 'Serviço cadastrado com sucesso!';
 
-        return redirect()->back()->with('success', $mensagem);
+        return redirect()->back()->with('success', $message);
     }
 
-    public function destroy(int $id)
+    /**
+     * Remove the specified service.
+     *
+     * @param int $id
+     * @return RedirectResponse
+     */
+    public function destroy(int $id): RedirectResponse
     {
         $service = Service::findOrFail($id);
-
-        // Preenche a coluna deleted_at (Soft Delete)
         $service->delete();
 
         return redirect()->back()->with('success', 'Serviço excluído com sucesso!');

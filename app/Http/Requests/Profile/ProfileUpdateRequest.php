@@ -10,6 +10,8 @@ class ProfileUpdateRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
     public function rules(): array
     {
@@ -21,14 +23,16 @@ class ProfileUpdateRequest extends FormRequest
                 'lowercase',
                 'email',
                 'max:255',
-                // Ensure the email is unique, but ignore the current user's email
+                // Ensure the email is unique, ignoring the current user's ID
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
         ];
     }
 
     /**
-     * Custom messages for validation errors.
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
      */
     public function messages(): array
     {

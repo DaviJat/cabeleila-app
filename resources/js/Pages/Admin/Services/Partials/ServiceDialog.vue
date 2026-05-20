@@ -90,7 +90,13 @@ const submit = () => {
             <!-- Name -->
             <div class="flex flex-col gap-1">
                 <label for="name" class="font-semibold">Nome</label>
-                <InputText id="name" v-model="form.name" :invalid="!!form.errors.name" placeholder="Corte de Cabelo Masculino" @update:modelValue="form.clearErrors('name')" />
+                <InputText
+                    id="name"
+                    maxlength="50"
+                    v-model="form.name"
+                    :invalid="!!form.errors.name"
+                    placeholder="Corte de Cabelo Masculino"
+                    @update:modelValue="form.clearErrors('name')" />
                 <small v-if="form.errors.name" class="text-red-500">{{ form.errors.name }}</small>
             </div>
             <!-- Description -->
@@ -100,6 +106,7 @@ const submit = () => {
                     id="description"
                     v-model="form.description"
                     rows="3"
+                    maxlength="250"
                     :invalid="!!form.errors.description"
                     placeholder="Serviço completo de corte com tesoura, incluindo lavagem e finalização."
                     @update:modelValue="form.clearErrors('description')" />
@@ -115,6 +122,8 @@ const submit = () => {
                         mode="currency"
                         currency="BRL"
                         locale="pt-BR"
+                        :min="0"
+                        :max="1000000"
                         :invalid="!!form.errors.price"
                         placeholder="R$ 100,00"
                         @update:modelValue="form.clearErrors('price')" />
@@ -127,7 +136,8 @@ const submit = () => {
                         id="duration"
                         v-model="form.duration_minutes"
                         suffix=" min"
-                        :min="1"
+                        :min="5"
+                        :max="480"
                         :invalid="!!form.errors.duration_minutes"
                         placeholder="45 min"
                         @update:modelValue="form.clearErrors('duration_minutes')" />

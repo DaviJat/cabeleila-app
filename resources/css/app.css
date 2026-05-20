@@ -10,6 +10,9 @@
         scrollbar-width: thin;
         scrollbar-color: #5a7253 #faf8f5;
     }
+    body {
+        padding-right: 0px !important;
+    }
     ::-webkit-scrollbar {
         width: 10px;
         height: 10px;

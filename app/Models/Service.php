@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-
 use Database\Factories\ServiceFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,20 +9,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-#[Fillable([
-    'name',            // Campo para o nome do serviço
-    'description',     // Campo para a descrição do serviço
-    'price',           // Campo para o preço do serviço
-    'duration_minutes' // Campo para a duração do serviço em minutos
-])]
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $description
+ * @property float $price
+ * @property int $duration_minutes
+ */
+#[Fillable(['name', 'description', 'price', 'duration_minutes'])]
 class Service extends Model
 {
-    /** @use HasFactory, SoftDeletes */
     use HasFactory, SoftDeletes;
 
     /**
-     *  Get the attributes that should be cast.
-     *  @return array<string, string>
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -34,7 +35,9 @@ class Service extends Model
     }
 
     /**
-     * Um serviço pode estar em vários agendamentos.
+     * Get the appointments associated with the service.
+     *
+     * @return BelongsToMany
      */
     public function appointments(): BelongsToMany
     {
