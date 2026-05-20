@@ -46,7 +46,7 @@ const profileItems = [
     {
         label: 'Meu Perfil',
         icon: 'pi pi-user',
-        command: () => router.get(route('perfil.edit')),
+        command: () => router.get(route('profile.index')),
     },
     { separator: true },
     {

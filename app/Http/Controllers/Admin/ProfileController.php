@@ -20,7 +20,7 @@ class ProfileController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('Profile/Index');
+        return Inertia::render('Admin/Profile/Index');
     }
 
     /**
@@ -39,24 +39,24 @@ class ProfileController extends Controller
     }
 
     /**
-     * Delete the user's account.
+     * Delete the user's account (Commented out).
      *
      * @param ProfileDestroyRequest $request
      * @return RedirectResponse
      */
-    public function destroy(ProfileDestroyRequest $request): RedirectResponse
-    {
-        $user = $request->user();
+    // public function destroy(ProfileDestroyRequest $request): RedirectResponse
+    // {
+    //     $user = $request->user();
 
-        // Logout before deleting the account to prevent session-related errors
-        Auth::logout();
+    //     // Logout before deleting the account to prevent session-related errors
+    //     Auth::logout();
 
-        $user->delete();
+    //     $user->delete();
 
-        // Invalidate the session and regenerate the CSRF token for security
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+    //     // Invalidate the session and regenerate the CSRF token for security
+    //     $request->session()->invalidate();
+    //     $request->session()->regenerateToken();
 
-        return Redirect::to('/login');
-    }
+    //     return Redirect::to('/login');
+    // }
 }

@@ -24,16 +24,17 @@ import { Panel } from 'primevue';
                 <section class="max-w-xl">
                     <UpdateProfileInformationForm />
                 </section>
-                <hr class="border-gray-200" />
                 <!-- Section for updating password -->
+                <hr class="border-gray-200" />
                 <section class="max-w-xl">
                     <UpdatePasswordForm />
                 </section>
-                <hr class="border-gray-200" />
                 <!-- Section for deleting account -->
+                <!-- Commented out for now -->
+                <!-- <hr class="border-gray-200" />
                 <section class="max-w-xl">
                     <DeleteUserForm />
-                </section>
+                </section> -->
             </div>
         </Panel>
     </AuthenticatedLayout>
