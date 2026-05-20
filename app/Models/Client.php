@@ -2,40 +2,57 @@
 
 namespace App\Models;
 
-use Database\Factories\ClientFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property string $full_name
+ * @property string $phone
+ * @property string|null $email
+ * @property string|null $cpf
+ * @property \Illuminate\Support\Carbon|null $birth_date
+ * @property string|null $postal_code
+ * @property string|null $street
+ * @property string|null $number
+ * @property string|null $complement
+ * @property string|null $neighborhood
+ * @property string|null $city
+ * @property string|null $state
+ * @property string|null $notes
+ * @property string|null $otp_code
+ * @property \Illuminate\Support\Carbon|null $otp_expires_at
+ */
 #[Fillable([
-    'full_name',       // Campo para o nome completo do cliente
-    'phone',           // Campo para o número de telefone do cliente
-    'email',           // Campo para o email do cliente
-    'cpf',             // Campo para o CPF do cliente
-    'birth_date',      // Campo para a data de nascimento do cliente
-    'postal_code',     // Campo para o CEP do endereço do cliente
-    'street',          // Campo para o nome da rua do endereço do cliente
-    'number',          // Campo para o número do endereço
-    'complement',      // Campo para complemento do endereço
-    'neighborhood',    // Campo para o bairro do cliente
-    'city',            // Campo para a cidade do cliente
-    'state',           // Campo para o estado (UF) do cliente
-    'notes',           // Campo para anotações adicionais sobre o cliente
-    'otp_code',        // Código temporário para login via WhatsApp
-    'otp_expires_at'   // Validade do código
+    'full_name',
+    'phone',
+    'email',
+    'cpf',
+    'birth_date',
+    'postal_code',
+    'street',
+    'number',
+    'complement',
+    'neighborhood',
+    'city',
+    'state',
+    'notes',
+    'otp_code',
+    'otp_expires_at'
 ])]
 #[Hidden(['remember_token', 'otp_code'])]
 class Client extends Authenticatable
 {
-    /** @use HasFactory<ClientFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, SoftDeletes;
 
     /**
-     *  Get the attributes that should be cast.
-     *  @return array<string, string>
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -45,13 +62,22 @@ class Client extends Authenticatable
         ];
     }
 
-    // O método getAuthPassword é necessário para que o Laravel saiba qual campo usar para autenticação, mesmo que neste caso não tenhamos uma senha tradicional.
-    public function getAuthPassword()
+    /**
+     * Get the password for the user.
+     * Required by Authenticatable interface even for passwordless/OTP flows.
+     *
+     * @return string
+     */
+    public function getAuthPassword(): string
     {
         return '';
     }
 
-    // Definindo a relação entre Cliente e Appointment, onde um cliente pode ter muitos agendamentos. 
+    /**
+     * Get the appointments associated with the client.
+     *
+     * @return HasMany
+     */
     public function appointments(): HasMany
     {
         return $this->hasMany(Appointment::class);

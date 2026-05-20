@@ -5,26 +5,39 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ClientRequest;
 use App\Models\Client;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class ClientController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the clients.
+     *
+     * @return Response
+     */
+    public function index(): Response
     {
-        // Listando clientes, possivelmente com paginação para melhor performance
-        $clients = Client::orderBy('id', 'desc')->paginate(15);
+        $clients = Client::orderBy('id', 'desc')->get();
 
         return Inertia::render('Admin/Clients/Index', [
             'clients' => $clients
         ]);
     }
 
-    public function store(ClientRequest $request)
+    /**
+     * Store or update a client.
+     *
+     * @param ClientRequest $request
+     * @return RedirectResponse
+     */
+    public function store(ClientRequest $request): RedirectResponse
     {
         $validated = $request->validated();
         $id = $request->input('id');
 
-        // Remove o ID para não tentar atualizar a chave primária diretamente
+        // Unset the ID to prevent it from being passed as a column value 
+        // to updateOrCreate, allowing it to act solely as the identifier.
         unset($validated['id']);
 
         Client::updateOrCreate(
@@ -32,15 +45,20 @@ class ClientController extends Controller
             $validated
         );
 
-        $mensagem = $id ? 'Cliente atualizado com sucesso!' : 'Cliente cadastrado com sucesso!';
+        $message = $id ? 'Cliente atualizado com sucesso!' : 'Cliente cadastrado com sucesso!';
 
-        return redirect()->back()->with('success', $mensagem);
+        return redirect()->back()->with('success', $message);
     }
 
-    public function destroy(int $id)
+    /**
+     * Remove the specified client.
+     *
+     * @param int $id
+     * @return RedirectResponse
+     */
+    public function destroy(int $id): RedirectResponse
     {
         $client = Client::findOrFail($id);
-
         $client->delete();
 
         return redirect()->back()->with('success', 'Cliente excluído com sucesso!');

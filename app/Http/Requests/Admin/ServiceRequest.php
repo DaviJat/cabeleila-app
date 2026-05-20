@@ -26,7 +26,7 @@ class ServiceRequest extends FormRequest
         return [
             'id'               => ['nullable', 'integer', 'exists:services,id'],
             'name'             => ['required', 'string', 'max:50'],
-            'description'      => ['required', 'string', 'max:250'],
+            'description'      => ['required', 'string', 'max:255'],
             'price'            => ['required', 'numeric', 'min:0', 'max:10000'],
             'duration_minutes' => ['required', 'integer', 'min:5', 'max:480'],
         ];
@@ -43,7 +43,7 @@ class ServiceRequest extends FormRequest
             'name.required'             => 'O nome do serviço é obrigatório.',
             'name.max'                  => 'O nome do serviço não pode exceder 50 caracteres.',
             'description.required'      => 'A descrição é obrigatória.',
-            'description.max'           => 'A descrição não pode exceder 250 caracteres.',
+            'description.max'           => 'A descrição não pode exceder 255 caracteres.',
 
             'price.required'            => 'O preço é obrigatório.',
             'price.numeric'             => 'O preço deve ser um valor numérico.',

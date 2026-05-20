@@ -22,7 +22,7 @@ class ClientFactory extends Factory
             'email'        => $this->faker->unique()->safeEmail(),
             'phone'        => $this->faker->cellphoneNumber(false),
             'cpf'          => $this->faker->cpf(false),
-            'birth_date'   => $this->faker->date('Y-m-d', '-18 years'), // Clientes com +18 anos
+            'birth_date'   => $this->faker->date('Y-m-d', '-18 years'),
 
             // Endereço
             'postal_code'  => $this->faker->postcode(),
@@ -31,7 +31,7 @@ class ClientFactory extends Factory
             'complement'   => $this->faker->secondaryAddress(),
             'neighborhood' => $this->faker->words(2, true),
             'city'         => $this->faker->city(),
-            'state'        => $this->faker->stateAbbr(), // Ex: BA, SP
+            'state'        => $this->faker->state(),
 
             // Notas e Autenticação
             'notes'        => $this->faker->sentence(),

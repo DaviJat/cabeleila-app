@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { DataTable, Column, Panel, Button, ConfirmDialog, useConfirm } from 'primevue';
+import { formatCPF, formatPhone } from '@/Utils/formatters';
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import ClientDialog from '@/Pages/Admin/Clients/Partials/ClientDialog.vue';
@@ -13,20 +14,17 @@ const confirm = useConfirm();
 
 const props = defineProps({
     clients: {
-        type: [Array, Object], // Aceita Array (get) ou Object (paginate)
+        type: Array,
         required: true,
     },
 });
 
-// Garante que o DataTable funcione quer você use get() ou paginate() no Controller
-const clientsData = computed(() => props.clients.data || props.clients);
-
 const openDialog = (client = null) => {
-    selectedClient.value = client; // Se null, abre modo criação; senão, modo edição
+    selectedClient.value = client; // If null, opens creation mode; otherwise, opens edit mode
     displayDialog.value = true;
 };
 
-// Confirm Dialog para exclusão de cliente
+// Confirm Dialog for deleting (deactivate) a client
 const deleteClient = (id) => {
     confirm.require({
         header: 'Confirmar Exclusão',
@@ -50,40 +48,43 @@ const deleteClient = (id) => {
     <AuthenticatedLayout>
         <ConfirmDialog class="mx-4" />
         <Panel :pt="{ contentWrapper: 'overflow-x-auto' }">
-            <!-- Cabeçalho da Tabela -->
             <template #header>
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full px-2 gap-4">
                     <div class="flex flex-col items-start">
                         <h2 class="text-2xl font-bold leading-tight text-gray-600">Clientes</h2>
                         <p class="text-sm text-gray-500">Gerencie a base de clientes do sistema</p>
                     </div>
-                    <!-- Botão Adicionar Cliente -->
+                    <!-- Add Client Button -->
                     <Button label="Adicionar Cliente" icon="pi pi-plus" class="w-full sm:w-auto" @click="openDialog()" />
                 </div>
             </template>
-
-            <!-- Conteúdo da Tabela -->
+            <!-- Table Content -->
             <DataTable
-                :value="clientsData"
+                :value="clients"
                 :paginator="true"
                 :rows="10"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                 stripedRows
                 class="border-x border-t">
+                <!-- ID  (hidden for small screens)-->
                 <Column field="id" header="Código" sortable class="hidden sm:table-cell" />
+                <!-- Full Name -->
                 <Column field="full_name" header="Nome" sortable />
-                <Column field="phone" header="Telefone" sortable />
+                <!-- Phone -->
+                <Column field="phone" header="Telefone" sortable>
+                    <template #body="slotProps">
+                        {{ formatPhone(slotProps.data.phone) }}
+                    </template>
+                </Column>
+                <!-- Email  (hidden for small screens) -->
                 <Column field="email" header="E-mail" sortable class="hidden md:table-cell" />
-                <Column field="cpf" header="CPF" sortable class="hidden lg:table-cell" />
-
                 <Column header="Ações" :exportable="false" style="min-width: 8rem">
                     <template #body="slotProps">
                         <div class="flex items-center gap-2">
-                            <!-- Botão Editar -->
+                            <!-- Edit Button -->
                             <Button icon="pi pi-pencil" variant="outlined" class="sm:!hidden" aria-label="Editar" @click="openDialog(slotProps.data)" />
                             <Button label="Editar" icon="pi pi-pencil" variant="outlined" class="!hidden sm:!inline-flex" @click="openDialog(slotProps.data)" />
-
-                            <!-- Botão Excluir -->
+                            <!-- Delete Button (deactivate) -->
                             <Button icon="pi pi-trash" variant="outlined" severity="danger" class="sm:!hidden" aria-label="Excluir" @click="deleteClient(slotProps.data.id)" />
                             <Button
                                 label="Excluir"
@@ -97,8 +98,7 @@ const deleteClient = (id) => {
                 </Column>
             </DataTable>
         </Panel>
-
-        <!-- Modal de criação/edição -->
+        <!-- Dialog for adding/editing clients -->
         <ClientDialog :visible="displayDialog" :client="selectedClient" @close="displayDialog = false" />
     </AuthenticatedLayout>
 </template>

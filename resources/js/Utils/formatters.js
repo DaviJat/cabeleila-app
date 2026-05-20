@@ -20,3 +20,26 @@ export const formatCurrency = (value) => {
         currency: 'BRL',
     });
 };
+
+// Format a phone number string to Brazilian format (e.g., "(11) 91234-5678")
+export const formatPhone = (value) => {
+    if (!value) return '';
+    const cleanValue = value.replace(/\D/g, '');
+    if (cleanValue.length === 11) {
+        return cleanValue.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+    }
+    if (cleanValue.length === 10) {
+        return cleanValue.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
+    }
+    return value;
+};
+
+// Format a CPF number string to Brazilian format (e.g., "123.456.789-00")
+export const formatCPF = (value) => {
+    if (!value) return '';
+    const cleanValue = value.replace(/\D/g, '');
+    if (cleanValue.length === 11) {
+        return cleanValue.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+    }
+    return value;
+};

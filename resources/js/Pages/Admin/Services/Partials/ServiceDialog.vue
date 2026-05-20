@@ -106,7 +106,7 @@ const submit = () => {
                     id="description"
                     v-model="form.description"
                     rows="3"
-                    maxlength="250"
+                    maxlength="255"
                     :invalid="!!form.errors.description"
                     placeholder="Serviço completo de corte com tesoura, incluindo lavagem e finalização."
                     @update:modelValue="form.clearErrors('description')" />
