@@ -28,7 +28,7 @@ onMounted(() => {
 
 <template>
     <Head title="Entrar" />
-    <!-- Container principal com fundo e layout flexível -->
+    <!-- Main content -->
     <div class="min-h-screen flex font-sans text-gray-800 overflow-hidden bg-[#FAF8F5]/80 backdrop-blur-[2px]">
         <div
             class="absolute top-8 left-6 sm:left-12 xl:left-24 z-30 transition-all duration-1000 ease-out delay-500"
@@ -40,7 +40,7 @@ onMounted(() => {
                 Voltar ao site
             </Link>
         </div>
-        <!-- Seção de login com imagem de fundo e formulário -->
+        <!-- Login form section -->
         <div
             class="flex-1 flex flex-col justify-center py-12 px-6 sm:px-12 lg:flex-none lg:w-1/2 xl:px-24 relative z-10 transition-all duration-1000 ease-out bg-[url('/images/background-hero.png')] bg-cover bg-center lg:bg-none lg:bg-[#FAF8F5]"
             :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'">
@@ -48,10 +48,10 @@ onMounted(() => {
                 <div class="flex items-center gap-3 mb-10">
                     <img src="/images/logo-cabeleila.svg" alt="Logo Cabeleila" class="h-10 w-auto object-contain" />
                 </div>
-                <!-- Formulário de login -->
+                <!-- Login heading -->
                 <h2 class="text-3xl font-bold leading-tight">Bem-vinda de volta</h2>
                 <p class="mt-2 text-sm text-gray-600 mb-8">Por favor, insira seus dados para acessar sua conta.</p>
-
+                <!-- Login Form -->
                 <form @submit.prevent="submit" class="flex flex-col gap-6">
                     <!-- E-mail -->
                     <div class="flex flex-col gap-1">

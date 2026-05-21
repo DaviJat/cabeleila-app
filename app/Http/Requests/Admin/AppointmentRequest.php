@@ -9,6 +9,8 @@ class AppointmentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * @return bool
      */
     public function authorize(): bool
     {
@@ -17,15 +19,17 @@ class AppointmentRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
-            // If an ID is provided, it's an update process
+            // If an ID is provided, the request is treated as an update process
             'id' => 'nullable|integer|exists:appointments,id',
             'status' => 'nullable|string|in:pending,confirmed,canceled',
 
-            // Creation fields are only required when NO ID is supplied
+            // Creation-specific fields are required only when no ID is supplied
             'client_id' => 'required_without:id|integer|exists:clients,id',
             'service_ids' => 'required_without:id|array|min:1',
             'service_ids.*' => 'integer|exists:services,id',
@@ -34,11 +38,12 @@ class AppointmentRequest extends FormRequest
                 'required_without:id',
                 'integer',
                 'exists:availabilities,id',
-                // Custom rule to prevent double-booking ONLY during creation phase
-                function ($attribute, $value, $fail) {
-                    if (!$this->filled('id')) {
+                // Custom rule to prevent double-booking exclusively during the creation phase
+                function ($value, $fail) {
+                    if (! $this->filled('id')) {
                         $availability = Availability::find($value);
-                        if ($availability && !$availability->is_available) {
+
+                        if ($availability && ! $availability->is_available) {
                             $fail('Este horário já foi ocupado por outro agendamento.');
                         }
                     }
@@ -48,7 +53,9 @@ class AppointmentRequest extends FormRequest
     }
 
     /**
-     * Get the error messages for the defined validation rules.
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
      */
     public function messages(): array
     {

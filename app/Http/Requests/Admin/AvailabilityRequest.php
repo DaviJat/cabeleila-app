@@ -10,6 +10,8 @@ class AvailabilityRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * @return bool
      */
     public function authorize(): bool
     {
@@ -18,6 +20,8 @@ class AvailabilityRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
     public function rules(): array
     {
@@ -27,15 +31,16 @@ class AvailabilityRequest extends FormRequest
             'hour' => [
                 'required',
                 'regex:/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', // Validates HH:mm format
-                // Ensures the date + hour combination is unique, ignoring current ID on update
+                // Ensure the date and hour combination is unique, ignoring the current record ID during updates
                 Rule::unique('availabilities')
-                    ->where(fn($query) => $query->where('date', $this->date)->where('hour', $this->hour))
-                    ->ignore($this->id),
-                // Validates that the chosen date and time has not already passed
+                    ->where(fn($query) => $query->where('date', $this->input('date'))->where('hour', $this->input('hour')))
+                    ->ignore($this->input('id')),
+                // Prevent the creation of availability slots in the past
                 function ($attribute, $value, $fail) {
-                    if ($this->date && $value) {
-                        $targetDateTime = Carbon::parse(Carbon::parse($this->date)->toDateString() . ' ' . $value);
-                        // If the target date and time is in the past, validation fails
+                    if ($this->input('date') && $value) {
+                        $targetDateTime = Carbon::parse(Carbon::parse($this->input('date'))->toDateString() . ' ' . $value);
+
+                        // If the target date and time has already passed, validation fails
                         if ($targetDateTime->isPast()) {
                             $fail('Não é possível cadastrar horários em datas ou horas passadas.');
                         }
@@ -46,7 +51,9 @@ class AvailabilityRequest extends FormRequest
     }
 
     /**
-     * Get the error messages for the defined validation rules.
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
      */
     public function messages(): array
     {

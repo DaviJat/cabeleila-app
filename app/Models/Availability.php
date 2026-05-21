@@ -2,23 +2,34 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
+/**
+ * @property int $id
+ * @property \Illuminate\Support\Carbon $date
+ * @property string $hour
+ * @property bool $is_available
+ * @property array $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Appointment[] $appointments
+ */
+#[Fillable(['date', 'hour', 'is_available'])]
 class Availability extends Model
 {
     use HasFactory;
 
     protected $appends = ['status'];
 
-    protected $fillable = [
-        'date',
-        'hour',
-        'is_available',
-    ];
-
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
@@ -27,11 +38,22 @@ class Availability extends Model
         ];
     }
 
+    /**
+     * Get the appointments associated with the availability slot.
+     *
+     * @return HasMany
+     */
     public function appointments(): HasMany
     {
         return $this->hasMany(Appointment::class);
     }
 
+    /**
+     * Interact with the availability's status attribute.
+     * Evaluates the current state based on availability flags and active appointments.
+     *
+     * @return Attribute
+     */
     protected function status(): Attribute
     {
         return Attribute::make(
