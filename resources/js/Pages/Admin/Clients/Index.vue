@@ -50,7 +50,7 @@ const deleteClient = (id) => {
         <Panel :pt="{ contentWrapper: 'overflow-x-auto' }">
             <template #header>
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full px-2 gap-4">
-                    <div class="flex flex-col items-start">
+                    <div class="flex flex-col gap-1">
                         <h2 class="text-2xl font-bold leading-tight text-gray-600">Clientes</h2>
                         <p class="text-sm text-gray-500">Gerencie a base de clientes do sistema</p>
                     </div>

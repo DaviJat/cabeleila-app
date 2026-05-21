@@ -5,91 +5,123 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Carbon\Carbon;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display the dashboard metrics and charts based on scheduled dates.
-     */
     public function index(Request $request): Response
     {
-        // Define default dates if no filter is applied (current month)
-        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
-        $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
+        // Default fallback period: current week (Monday to Sunday)
+        $defaultStart = Carbon::now()->startOfWeek()->toDateString(); // Monday
+        $defaultEnd = Carbon::now()->endOfWeek()->toDateString();     // Sunday
 
-        // Base query: Joining availabilities to filter by the ACTUAL SCHEDULED DATE, not created_at
-        $baseQuery = Appointment::query()
-            ->join('availabilities', 'appointments.availability_id', '=', 'availabilities.id')
-            ->whereBetween('availabilities.date', [$startDate, $endDate]);
+        // Check if parameters exist in the request URL, otherwise apply default week
+        $startDate = $request->has('start_date') ? $request->input('start_date') : $defaultStart;
+        $endDate = $request->has('end_date') ? $request->input('end_date') : $defaultEnd;
 
-        // 1. Calculate General KPIs (Explicitly using appointments.status to avoid ambiguity)
-        $totalAppointments = (clone $baseQuery)->whereIn('appointments.status', ['pending', 'confirmed', 'completed'])->count();
-        $pending = (clone $baseQuery)->where('appointments.status', 'pending')->count();
-        $confirmed = (clone $baseQuery)->where('appointments.status', 'confirmed')->count();
-        $completed = (clone $baseQuery)->where('appointments.status', 'completed')->count();
+        // Fetch appointments scoped by the date parameters
+        $appointments = $this->getAppointmentsInPeriod($startDate, $endDate);
 
-        // Calculate Total Revenue joining services and availabilities
-        $totalRevenue = DB::table('appointments')
-            ->join('availabilities', 'appointments.availability_id', '=', 'availabilities.id')
-            ->join('appointment_service', 'appointments.id', '=', 'appointment_service.appointment_id')
-            ->join('services', 'appointment_service.service_id', '=', 'services.id')
-            ->whereIn('appointments.status', ['confirmed', 'completed'])
-            ->whereBetween('availabilities.date', [$startDate, $endDate])
-            ->sum('services.price');
+        // Process key performance indicators for the dashboard summary cards
+        $summaryData = $this->getSummaryMetrics($appointments);
 
-        // 2. Calculate Chart Data: Top 5 Services performed
-        $topServices = DB::table('appointment_service')
-            ->join('appointments', 'appointment_service.appointment_id', '=', 'appointments.id')
-            ->join('availabilities', 'appointments.availability_id', '=', 'availabilities.id')
-            ->join('services', 'appointment_service.service_id', '=', 'services.id')
-            ->whereIn('appointments.status', ['pending', 'confirmed', 'completed']) // <-- Adicionado o 'pending' aqui!
-            ->whereBetween('availabilities.date', [$startDate, $endDate])
-            ->select('services.name', DB::raw('count(*) as total'))
-            ->groupBy('services.id', 'services.name')
-            ->orderByDesc('total')
-            ->limit(5)
-            ->get();
+        // Process revenue evolution timeline metrics (Line Chart)
+        $revenueTimeline = $this->getRevenueTimeline($appointments);
 
-        // 3. Calculate Chart Data: Revenue over time (Grouped by Scheduled Date)
-        $revenueOverTime = DB::table('appointments')
-            ->join('availabilities', 'appointments.availability_id', '=', 'availabilities.id')
-            ->join('appointment_service', 'appointments.id', '=', 'appointment_service.appointment_id')
-            ->join('services', 'appointment_service.service_id', '=', 'services.id')
-            ->whereIn('appointments.status', ['confirmed', 'completed'])
-            ->whereBetween('availabilities.date', [$startDate, $endDate])
-            ->select('availabilities.date', DB::raw('SUM(services.price) as daily_revenue'))
-            ->groupBy('availabilities.date')
-            ->orderBy('availabilities.date')
-            ->get();
+        // Process top booked services ranking metrics (Bar Chart)
+        $topServices = $this->getTopServices($appointments);
 
-        // Return Inertia Response with formatted payload
-        return Inertia::render('Admin/Dashboard', [
-            'filters' => [
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-            ],
-            'kpis' => [
-                'totalRevenue' => (float) $totalRevenue,
-                'totalAppointments' => $totalAppointments,
-                'completed' => $completed,
-                'confirmed' => $confirmed,
-                'pending' => $pending,
-            ],
-            'charts' => [
-                'revenue' => [
-                    // Format dates to DD/MM for better chart display using the new availabilities.date
-                    'labels' => $revenueOverTime->pluck('date')->map(fn($date) => Carbon::parse($date)->format('d/m'))->toArray(),
-                    'data' => $revenueOverTime->pluck('daily_revenue')->toArray(),
-                ],
-                'services' => [
-                    'labels' => $topServices->pluck('name')->toArray(),
-                    'data' => $topServices->pluck('total')->toArray(),
-                ],
-            ],
+        return Inertia::render('Admin/Dashboard/Index', [
+            'summaryData'     => $summaryData,
+            'revenueTimeline' => $revenueTimeline,
+            'topServices'     => $topServices,
         ]);
+    }
+
+    /**
+     * Query appointments within the chosen period via the 'availability' relation.
+     */
+    private function getAppointmentsInPeriod(?string $startDate, ?string $endDate): Collection
+    {
+        // If both dates are null, bypass the date scope to fetch all records
+        if (is_null($startDate) && is_null($endDate)) {
+            return Appointment::with(['services', 'availability'])
+                ->withSum('services as total_services_price', 'price') // Sum up service prices
+                ->get();
+        }
+
+        return Appointment::whereHas('availability', function ($query) use ($startDate, $endDate) {
+            $query->whereBetween('date', [$startDate, $endDate]);
+        })
+            ->with(['services', 'availability']) // Load relations to safely map graphs without new database hits
+            ->withSum('services as total_services_price', 'price') // Sum up service prices
+            ->get();
+    }
+
+    /**
+     * Extract total counters and calculate revenue based on status.
+     */
+    private function getSummaryMetrics(Collection $appointments): array
+    {
+        // Extract total counters based on status
+        $totalAppointments = $appointments->count();
+        $completed = $appointments->where('status', 'completed')->count();
+        $confirmed = $appointments->where('status', 'confirmed')->count();
+        $pending = $appointments->where('status', 'pending')->count();
+
+        // Calculate revenue only from 'completed' appointments
+        $totalRevenue = $appointments->where('status', 'completed')->sum('total_services_price');
+
+        return [
+            'revenue'      => (float) $totalRevenue,
+            'appointments' => $totalAppointments,
+            'completed'    => $completed,
+            'confirmed'    => $confirmed,
+            'pending'      => $pending,
+        ];
+    }
+
+    /**
+     * Group completed appointments revenue by formatted date strings.
+     */
+    private function getRevenueTimeline(Collection $appointments): array
+    {
+        $timeline = $appointments->where('status', 'completed')
+            ->groupBy(function ($appointment) {
+                return Carbon::parse($appointment->availability->date)->format('d/m');
+            })
+            ->map(function ($dayGroup) {
+                return $dayGroup->sum('total_services_price');
+            })
+            ->sortKeys();
+
+        return [
+            'labels' => $timeline->keys()->toArray(),
+            'values' => $timeline->values()->toArray(),
+        ];
+    }
+
+    /**
+     * Flatten service relations from scope, group by name, and sort by descending count.
+     */
+    private function getTopServices(Collection $appointments): array
+    {
+        $services = $appointments->flatMap(function ($appointment) {
+            return $appointment->services;
+        })
+            ->groupBy('name')
+            ->map(function ($serviceGroup) {
+                return $serviceGroup->count();
+            })
+            ->sortByDesc(fn($count) => $count)
+            ->take(5);
+
+        return [
+            'labels' => $services->keys()->toArray(),
+            'values' => $services->values()->toArray(),
+        ];
     }
 }

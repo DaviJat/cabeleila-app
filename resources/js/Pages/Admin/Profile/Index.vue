@@ -13,7 +13,7 @@ import { Panel } from 'primevue';
         <Panel>
             <template #header>
                 <div class="flex justify-between items-center w-full px-2">
-                    <div class="flex flex-col items-start">
+                    <div class="flex flex-col gap-1">
                         <h2 class="text-2xl font-bold leading-tight text-gray-600">Meu Perfil</h2>
                         <p class="text-sm text-gray-500">Gerencie suas informações pessoais e segurança da conta</p>
                     </div>
