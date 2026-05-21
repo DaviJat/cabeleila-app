@@ -59,6 +59,13 @@ const handleNavigation = (item) => {
         router.post(route('logout'));
     }
 };
+
+const isLoaded = ref(false);
+onMounted(() => {
+    setTimeout(() => {
+        isLoaded.value = true;
+    }, 50);
+});
 </script>
 
 <template>
@@ -145,7 +152,7 @@ const handleNavigation = (item) => {
                     </template>
                 </Menubar>
             </header>
-            <main class="flex-1 flex flex-col gap-6">
+            <main class="flex-1 flex flex-col gap-6 transition-all duration-700 ease-out" :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'">
                 <slot />
             </main>
         </div>
