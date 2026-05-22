@@ -13,6 +13,7 @@ Cabeleila is a lightweight appointment and customer management system built excl
 - [Installation Guide](#installation-guide)
 - [Screenshots](#screenshots)
 - [Deployment Tips](#deployment-tips)
+- [Scheduling (Automated Tasks)](#scheduling-automated-tasks)
 - [Contributing](#contributing)
 - [About](#about)
 - [License](#license)
@@ -75,14 +76,13 @@ This project was built with a modern monolith architecture, leveraging Inertia.j
 ### Local setup (development)
 
 1. Clone the repo and enter the project folder:
-```bash
+
+```
 git clone [https://github.com/DaviJat/cabeleila-app.git](https://github.com/DaviJat/cabeleila-app.git) cabeleila-app && cd cabeleila-app
 
 ```
 
 1.  Install PHP dependencies:
-
-Bash
 
 ```
 composer install
@@ -91,8 +91,6 @@ composer install
 
 1.  Install Node dependencies and build frontend assets:
 
-Bash
-
 ```
 npm install
 npm run dev
@@ -100,8 +98,6 @@ npm run dev
 ```
 
 1.  Environment file and app key:
-
-Bash
 
 ```
 cp .env.example .env
@@ -128,8 +124,6 @@ WHATSAPP_ADMIN_NUMBER="(11) 99999-9999"
 
 1.  Migrate and seed the database:
 
-Bash
-
 ```
 php artisan migrate --seed
 
@@ -137,16 +131,12 @@ php artisan migrate --seed
 
 1.  Run the application:
 
-Bash
-
 ```
 php artisan serve --host=127.0.0.1 --port=8000
 
 ```
 
 ### Production build
-
-Bash
 
 ```
 composer install --optimize-autoloader --no-dev
@@ -187,6 +177,20 @@ Deployment Tips
 -   Enable caching in production: `php artisan config:cache && php artisan route:cache && php artisan view:cache`.
 
 -   Ensure your server's Cron is set up to run Laravel's scheduler (required for the automatic completion/cancellation of past appointments).
+
+## Scheduling (Automated Tasks)
+
+The system relies on the Laravel Scheduler to automatically process appointment statuses (marking past appointments as "completed" or "canceled").
+
+- **In local development:** Run this command in a separate terminal to keep the scheduler active:
+```
+  php artisan schedule:work
+```
+
+- **In local development:** Run this command in a separate terminal to keep the scheduler active:
+```
+  php artisan schedule:work
+```
 
 Contributing
 ------------
