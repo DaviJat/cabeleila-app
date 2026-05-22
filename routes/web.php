@@ -16,7 +16,7 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('Home');
-});
+})->name('home');
 
 // Protected routes for authenticated users (admin)
 Route::middleware('auth')->group(function () {
