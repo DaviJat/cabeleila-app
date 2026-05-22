@@ -1,6 +1,6 @@
 <script setup>
-import { computed } from 'vue';
-import { useForm, router } from '@inertiajs/vue3';
+import { computed, watch } from 'vue';
+import { useForm, router, usePage } from '@inertiajs/vue3';
 import { useToast } from 'primevue/usetoast';
 import { Select, Button, Textarea, MultiSelect, Tag } from 'primevue';
 import { formatCurrency } from '@/Utils/formatters';
@@ -13,6 +13,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 const toast = useToast();
+const page = usePage();
 
 const form = useForm({
     availability_id: props.availability?.id,
@@ -20,6 +21,21 @@ const form = useForm({
     service_ids: [],
     notes: '',
 });
+
+// Watch the shared global dynamic flash space to intercept the generated WhatsApp Web URL payload
+watch(
+    () => page.props.flash?.whatsapp_url,
+    (newUrl) => {
+        if (newUrl) {
+            // Open the deep-linked standard WhatsApp Web interface composition string in a new tab
+            window.open(newUrl, '_blank');
+
+            // Clear the flash state immediately on the client side to prevent ghost triggers on remount
+            page.props.flash.whatsapp_url = null;
+        }
+    },
+    { immediate: true },
+);
 
 // Fetches the single active appointment (matches the backend model logic)
 const activeAppointment = computed(() => {
@@ -34,7 +50,7 @@ const hasActiveAppointment = computed(() => {
 
 // Handles the creation of a new appointment
 const submitAppointment = () => {
-    form.post(route('appointments.store'), {
+    form.post(route('admin.appointments.store'), {
         onSuccess: () => {
             emit('close');
             toast.add({ severity: 'success', summary: 'Sucesso!', detail: 'Agendamento realizado com sucesso!', life: 3000 });
@@ -45,7 +61,7 @@ const submitAppointment = () => {
 // Handles status changes (confirm or cancel) for an existing appointment
 const changeAppointmentStatus = (appointmentId, newStatus) => {
     router.post(
-        route('appointments.store'),
+        route('admin.appointments.store'),
         {
             id: appointmentId,
             status: newStatus,
@@ -55,7 +71,7 @@ const changeAppointmentStatus = (appointmentId, newStatus) => {
             onSuccess: () => {
                 const actionLabel = newStatus === 'confirmed' ? 'confirmado' : 'cancelado';
                 toast.add({ severity: 'success', summary: 'Atualizado', detail: `Agendamento ${actionLabel} com sucesso!`, life: 3000 });
-                emit('close'); // Opcional: fecha o modal automaticamente após a ação
+                emit('close');
             },
         },
     );

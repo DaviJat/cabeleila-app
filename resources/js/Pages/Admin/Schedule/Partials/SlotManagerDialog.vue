@@ -18,6 +18,20 @@ const toast = useToast();
 const page = usePage();
 const emit = defineEmits(['close']);
 
+// Watch the shared global dynamic flash space to intercept rescheduling URL payloads
+watch(
+    () => page.props.flash?.whatsapp_url,
+    (newUrl) => {
+        if (newUrl) {
+            // Open the deep-linked standard WhatsApp Web interface
+            window.open(newUrl, '_blank');
+            // Clear the flash state immediately
+            page.props.flash.whatsapp_url = null;
+        }
+    },
+    { immediate: true },
+);
+
 // Determines if the slot is already saved in the database
 const isEditing = computed(() => !!props.availability?.id);
 

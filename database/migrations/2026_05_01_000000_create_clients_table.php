@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
     public function up(): void
     {
@@ -27,10 +29,10 @@ return new class extends Migration {
             $table->string('complement')->nullable();
             $table->string('neighborhood')->nullable();
             $table->string('city')->nullable();
-            $table->string('state', 50);
+            $table->string('state', 50)->nullable(); // Changed to nullable to fix constraint violations during OTP generation
 
             // WhatsApp Authentication (OTP)
-            // Password remains nullable since the authentication flow relies on codes
+            // Password remains nullable since the authentication flow relies on transient codes
             $table->string('password')->nullable();
             $table->string('otp_code', 6)->nullable();
             $table->timestamp('otp_expires_at')->nullable();
@@ -47,6 +49,8 @@ return new class extends Migration {
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
     public function down(): void
     {

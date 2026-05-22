@@ -39,7 +39,7 @@ class AppointmentRequest extends FormRequest
                 'integer',
                 'exists:availabilities,id',
                 // Custom rule to prevent double-booking exclusively during the creation phase
-                function ($value, $fail) {
+                function ($attribute, $value, $fail) {
                     if (! $this->filled('id')) {
                         $availability = Availability::find($value);
 

@@ -7,17 +7,15 @@ const props = defineProps({
     availability: { type: Object, required: true },
 });
 
-// Sorts appointments from newest to oldest based on creation date
+// Chronologically organize structural history tracking lists (newest adjustments display first)
 const history = computed(() => {
     if (!props.availability || !props.availability.appointments) return [];
-
-    // Create a shallow copy array to avoid mutating the original prop, then sort
     return [...props.availability.appointments].sort((a, b) => {
         return new Date(b.created_at) - new Date(a.created_at);
     });
 });
 
-// Helper to translate status and assign the correct PrimeVue Tag severity
+// Translate contextual states into explicit metadata labels and severity properties
 const getStatusProps = (status) => {
     const map = {
         confirmed: { label: 'Confirmado', severity: 'info' },
@@ -27,7 +25,6 @@ const getStatusProps = (status) => {
     return map[status] || { label: status, severity: 'secondary' };
 };
 
-// Formats the creation timestamp into a readable localized string
 const formatDateTime = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -46,11 +43,11 @@ const formatDateTime = (dateString) => {
         <h3 class="text-lg font-bold leading-tight text-gray-600">Histórico de Movimentações</h3>
         <p class="text-xs text-gray-500">Acompanhe o registro de reservas e cancelamentos ocorridos nesta vaga.</p>
     </div>
-
+    <!-- Message when no history is available -->
     <div v-if="history.length === 0" class="text-sm text-gray-500 italic p-4 bg-gray-50 rounded-lg text-center border border-dashed border-gray-300">
         Nenhum histórico registrado para este horário.
     </div>
-
+    <!-- Appointment history items -->
     <div v-else class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
         <div
             v-for="appointment in history"
@@ -64,12 +61,12 @@ const formatDateTime = (dateString) => {
                 </div>
                 <Tag :value="appointment.status_badge.label" :severity="appointment.status_badge.severity" />
             </div>
-
+            <!-- Appointment details -->
             <div class="mb-2">
                 <span class="font-semibold text-gray-700">Cliente: </span>
                 <span class="text-gray-600">{{ appointment.client?.full_name || 'Desconhecido' }}</span>
             </div>
-
+            <!-- Services list -->
             <div v-if="appointment.services && appointment.services.length > 0" class="mb-2">
                 <span class="font-semibold text-gray-700 block mb-1">Serviços:</span>
                 <ul class="list-disc list-inside text-gray-600 ml-1">
@@ -79,7 +76,7 @@ const formatDateTime = (dateString) => {
                     </li>
                 </ul>
             </div>
-
+            <!-- Observations -->
             <div v-if="appointment.notes" class="mt-3 bg-gray-100/50 p-2 rounded text-gray-600 border-l-2 border-gray-300">
                 <p class="font-semibold text-xs text-gray-500 mb-1">Observações:</p>
                 <span class="italic">{{ appointment.notes }}</span>
