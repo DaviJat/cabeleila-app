@@ -187,11 +187,6 @@ The system relies on the Laravel Scheduler to automatically process appointment 
   php artisan schedule:work
 ```
 
-- **In local development:** Run this command in a separate terminal to keep the scheduler active:
-```
-  php artisan schedule:work
-```
-
 Contributing
 ------------
 
