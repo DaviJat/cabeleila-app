@@ -1,58 +1,195 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Cabeleila - Lightweight Salon Management
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Description
 
-## About Laravel
+Cabeleila is a lightweight appointment and customer management system built exclusively for solo beauty professionals. It focuses on simplifying daily operations with an emphasis on extremely fast customer registration and login using only the customer's phone number.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Table of Contents
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- [Target Audience & Objective](https://www.google.com/search?q=%23target-audience--objective)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- [How it Works (Features)](https://www.google.com/search?q=%23how-it-works-features)
 
-## Learning Laravel
+- [Business Rules](https://www.google.com/search?q=%23business-rules)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- [Installation Guide](https://www.google.com/search?q=%23installation-guide)
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- [Screenshots](https://www.google.com/search?q=%23screenshots)
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- [Contributing](https://www.google.com/search?q=%23contributing)
 
-## Agentic Development
+## Target Audience & Objective
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+- **Audience:** Solo beauticians and independent beauty professionals who need a no-fuss, centralized scheduling and client-management tool.
 
-```bash
-composer require laravel/boost --dev
+- **Objective:** Reduce friction for customer onboarding and appointment booking. Customers sign in or register with a single phone number, minimizing data entry for walk-ins and repeat clients.
 
-php artisan boost:install
+## How it Works (Features)
+
+- **Phone-first login/registration:** Customers are identified by phone number. Entering a phone number either finds an existing client or creates a new, minimal client record instantly.
+
+- **Appointments & Services:** Create appointments linked to one or more services. Services are defined in the system and attached to appointments via a pivot table.
+
+- **Client Autonomy:** Clients can easily schedule their visits, view their upcoming appointments, and make changes if needed (subject to time constraints).
+
+- **Availability management:** The admin declares their availability windows, and the system automatically enforces scheduling rules against those specific hours.
+
+- **Simple admin UI:** A single centralized dashboard to manage clients, services, availabilities, and appointments through a responsive Vue + Blade interface.
+
+## Business Rules
+
+1.  **Client identity by phone:** The phone number is the unique identifier for customers. If a provided phone number exists, the system logs the customer in; otherwise, it creates a new client profile with that phone number.
+
+2.  **No password barrier for customers:** The customer flow is intentionally lightweight --- phone number only --- suitable for in-salon quick sign-ins.
+
+3.  **Single-Admin Architecture:** The system is designed for a single professional. All appointments, services, and availabilities belong to one central schedule managed by the sole admin account.
+
+4.  **Appointment constraints:**
+    - Appointments must be scheduled within the admin's configured availability windows (availabilities table).
+
+    - Appointments cannot overlap.
+
+    - Each appointment may include multiple services.
+
+5.  **Rescheduling & Cancellations:** Clients have the autonomy to view, modify, or cancel their upcoming appointments, but **only up to 48 hours (2 days) before** the scheduled time. After this window, changes must be made directly with the administrator.
+
+6.  **Automated Status Updates:** Past appointments are automatically processed by the system and marked as "completed" or "canceled" once their scheduled time has passed, keeping the dashboard clean and up-to-date.
+
+7.  **Data integrity:** Deleting a service or client cascades or is prevented according to the database policy (review migration files in database/migrations to adjust).
+
+## Installation Guide
+
+### Prerequisites
+
+- PHP 8.1+
+
+- Composer
+
+- Node.js 18+ and npm
+
+- PostgreSQL (Database)
+
+### Local setup (development)
+
+1.  Clone the repo and enter the project folder:
+
+Bash
+
+```
+git clone https://github.com/DaviJat/cabeleila-app.git cabeleila-app && cd cabeleila-app
+
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+1.  Install PHP dependencies:
+
+Bash
+
+```
+composer install
+
+```
+
+1.  Install Node dependencies and build frontend assets:
+
+Bash
+
+```
+npm install
+npm run dev
+
+```
+
+1.  Environment file and app key:
+
+Bash
+
+```
+cp .env.example .env
+php artisan key:generate
+
+```
+
+1.  Configure .env: Set up your database connection and admin contact info. _Note: This project does not use external mailing or WhatsApp APIs by default._
+
+Snippet de código
+
+```
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=leila_db_example
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+# Admin contact number for customer support / manual changes
+WHATSAPP_ADMIN_NUMBER="(11) 99999-9999"
+
+```
+
+1.  Migrate and seed the database:
+
+Bash
+
+```
+php artisan migrate --seed
+
+```
+
+_(If you prefer a fresh database reset during development, use: php artisan migrate:fresh --seed)_
+
+1.  Run the application:
+
+Bash
+
+```
+php artisan serve --host=127.0.0.1 --port=8000
+
+```
+
+Open http://127.0.0.1:8000 in your browser.
+
+### Production build
+
+Bash
+
+```
+composer install --optimize-autoloader --no-dev
+npm ci
+npm run build
+php artisan migrate --force
+
+```
+
+## Screenshots
+
+### 📱 Client Flow
+
+_Extremely fast authentication using only a phone number._
+
+_Clients selecting services and available time slots._
+
+### 💻 Admin Dashboard
+
+_Overview of the day's appointments and statuses._
+
+_Setting up working hours and service durations._
+
+## Deployment Tips
+
+- Use environment-specific .env values and never commit secrets.
+
+- Enable caching in production: php artisan config:cache && php artisan route:cache && php artisan view:cache.
+
+- Ensure your server's Cron is set up to run Laravel's scheduler (required for the automatic completion/cancellation of past appointments).
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+If you'd like changes or additions, open an issue or submit a PR. Keep changes focused.
 
-## Code of Conduct
+## About
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+_Note: This project was originally developed as a technical challenge for the DSIN recruitment process, and has since been open-sourced._
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The Cabeleila App is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
